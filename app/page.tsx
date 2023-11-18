@@ -11,8 +11,16 @@ export default function Home() {
   // 検索結果を表示する配列（ここではダミーデータを使用）
   const results = [
     // ダミーデータ
-    { id: 1, type: 'borrow', status: 'unsettled', partner: 'John Doe' },
-    // さらに結果を追加...
+    { id: 1, name: 'A', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
+    { id: 2, name: 'B', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
+    { id: 3, name: 'C', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
+    { id: 4, name: 'D', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
+    { id: 5, name: 'E', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
+    { id: 6, name: 'F', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
+    { id: 7, name: 'G', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
+    { id: 8, name: 'H', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
+    { id: 9, name: 'I', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
+    { id: 10, name: 'J', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
   ];
 
   // 検索を実行する関数（ここではダミーの実装）
@@ -35,7 +43,23 @@ export default function Home() {
       </div>
 
       {/* 検索条件の表示 */}
-      <div className="w-11/12 flex justify-end items-center mt-2 mx-auto relative">
+      <div className="w-11/12 flex justify-between items-center mt-2 mx-auto relative">
+        <div>
+          {settlementStatus === 'unsettled' && (
+            <button
+            className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
+            >
+              清算額を計算
+            </button>
+          )}
+
+          <button
+            className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
+          >
+            削除
+          </button>
+        </div>
+
         {/* 条件変更ボタン */}
         <button
           onClick={toggleSearchVisibility}
@@ -113,16 +137,40 @@ export default function Home() {
 
       {/* 検索結果の一覧 */}
       <div className="flex-1 overflow-y-auto p-4">
-        {results.map((result) => (
-          <div
-            key={result.id}
-            className="p-4 mb-4 bg-white rounded shadow"
-          >
-            <p>タイプ: {result.type === 'borrow' ? '借り' : '貸し'}</p>
-            <p>ステータス: {result.status === 'unsettled' ? '未清算' : '清算済み'}</p>
-            <p>相手: {result.partner}</p>
+      {results.map((result) => (
+        <div key={result.id} className="mb-4 p-4 bg-white rounded-lg shadow flex items-center justify-between">
+          {/* 左端：チェックボックス */}
+          <input
+            type="checkbox"
+            className="form-checkbox h-7 w-7 text-green-500 rounded focus:ring-0 focus:outline-none transition duration-150 ease-in-out"
+          />
+
+          {/* 中央の内容 */}
+          <div className="flex-grow ml-4">
+            {/* 項目名 */}
+            <h3 className="text-sm font-semibold text-gray-800">{result.name}</h3>
+
+            {/* 相手 */}
+            <p className="text-xs text-gray-600">相手: {result.partner}</p>
+
+            {/* 金額 */}
+            <p className="text-lg font-bold text-gray-800">¥{result.amount}</p>
           </div>
-        ))}
+
+          {/* 右端：編集ボタンと貸し借りステータス */}
+          <div className="flex items-center">
+            <p className={`mr-4 text-lg font-bold ${result.type === 'borrow' ? 'text-red-500' : 'text-blue-500'}`}>
+              {result.type === 'borrow' ? '借り' : '貸し'}
+            </p>
+
+            {/* 編集ボタン */}
+            <button className="py-6 px-3 text-xs text-gray-500 bg-gray-200 rounded hover:bg-gray-300">
+              編集
+            </button>
+          </div>
+        </div>
+      ))}
+
       </div>
     </div>
   );

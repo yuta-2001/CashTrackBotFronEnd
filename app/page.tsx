@@ -1,33 +1,36 @@
 'use client';
 import { useState } from 'react';
+import { mockTransactions, mockOpponents } from './_libs/placeholder-data';
+
+enum TransactionType {
+  Lend = 1,
+  Borrow = 2,
+}
+type SearchType = 'all' | TransactionType.Lend | TransactionType.Borrow;
+type SearchOpponent = 'all' | number;
 
 export default function Home() {
-  // 状態管理用のフック
-  const [searchType, setSearchType] = useState('all'); // 'all', 'lend', 'borrow'
-  const [settlementStatus, setSettlementStatus] = useState('unsettled'); // 'unsettled', 'settled'
-  const [partnerType, setPartnerType] = useState('all'); // 'all', 'individual'
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
 
-  // 検索結果を表示する配列（ここではダミーデータを使用）
-  const results = [
-    // ダミーデータ
-    { id: 1, name: 'A', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-    { id: 2, name: 'B', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-    { id: 3, name: 'C', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-    { id: 4, name: 'D', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-    { id: 5, name: 'E', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-    { id: 6, name: 'F', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-    { id: 7, name: 'G', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-    { id: 8, name: 'H', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-    { id: 9, name: 'I', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-    { id: 10, name: 'J', type: 'borrow', status: 'unsettled', partner: 'John Doe', amount: 1000 },
-  ];
+  const [searchType, setSearchType] = useState<SearchType>('all');
+  const [searchIsSettled, setSearchIsSettled] = useState<boolean>(false);
+  const [sarchOpponent, setSearchOpponent] = useState<SearchOpponent>('all');
+  const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
 
-  // 検索を実行する関数（ここではダミーの実装）
-  const handleSearch = () => {
-    console.log('Search with:', { searchType, settlementStatus, partnerType });
-    // 実際の検索処理をここで実行...
-  };
+  const results = mockTransactions.filter((transaction) => {
+    if (searchType !== 'all' && transaction.type !== Number(searchType)) {
+      return false;
+    }
+
+    if (transaction.is_settled !== searchIsSettled) {
+      return false;
+    }
+
+    if (sarchOpponent !== 'all' && transaction.opponent_id !== Number(sarchOpponent)) {
+      return false;
+    }
+
+    return true;
+  });
 
   const toggleSearchVisibility = () => {
     setIsSearchVisible(!isSearchVisible);
@@ -45,7 +48,7 @@ export default function Home() {
       {/* 検索条件の表示 */}
       <div className="w-11/12 flex justify-between items-center mt-2 mx-auto relative">
         <div>
-          {settlementStatus === 'unsettled' && (
+          {!searchIsSettled && (
             <button
             className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
             >
@@ -69,7 +72,7 @@ export default function Home() {
         </button>
 
         {isSearchVisible && (
-          <form onSubmit={handleSearch} className="bg-white p-4 shadow-md w-2/3 absolute top-8 right-0 rounded-sm">
+          <div className="bg-white p-4 shadow-md w-2/3 absolute top-8 right-0 rounded-sm">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {/* 取引タイプ選択 */}
               <div>
@@ -80,11 +83,11 @@ export default function Home() {
                   id="searchType"
                   className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   value={searchType}
-                  onChange={(e) => setSearchType(e.target.value)}
+                  onChange={(e) => setSearchType(e.target.value as SearchType)}
                 >
                   <option value="all">全て</option>
-                  <option value="lend">貸し</option>
-                  <option value="borrow">借り</option>
+                  <option value="1">貸し</option>
+                  <option value="2">借り</option>
                 </select>
               </div>
 
@@ -96,11 +99,11 @@ export default function Home() {
                 <select
                   id="settlementStatus"
                   className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  value={settlementStatus}
-                  onChange={(e) => setSettlementStatus(e.target.value)}
+                  value={searchIsSettled ? '1' : '0'}
+                  onChange={(e) => setSearchIsSettled(e.target.value === '1')}
                 >
-                  <option value="unsettled">未清算</option>
-                  <option value="settled">清算済み</option>
+                  <option value="0">未清算</option>
+                  <option value="1">清算済み</option>
                 </select>
               </div>
 
@@ -112,25 +115,19 @@ export default function Home() {
                 <select
                   id="partnerType"
                   className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  value={partnerType}
-                  onChange={(e) => setPartnerType(e.target.value)}
+                  value={sarchOpponent}
+                  onChange={(e) => setSearchOpponent(e.target.value as SearchOpponent)}
                 >
                   <option value="all">全て</option>
-                  <option value="individual">個人</option>
+                  {
+                    mockOpponents.map((opponent) => (
+                      <option value={opponent.id}>{opponent.name}</option>
+                    ))
+                  }
                 </select>
               </div>
             </div>
-
-            {/* 検索ボタン */}
-            <div className="mt-4">
-              <button
-                type="submit"
-                className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              >
-                検索
-              </button>
-            </div>
-          </form>
+          </div>
         )}
       </div>
 
@@ -151,7 +148,7 @@ export default function Home() {
             <h3 className="text-sm font-semibold text-gray-800">{result.name}</h3>
 
             {/* 相手 */}
-            <p className="text-xs text-gray-600">相手: {result.partner}</p>
+            <p className="text-xs text-gray-600">相手: {result.opponent_name}</p>
 
             {/* 金額 */}
             <p className="text-lg font-bold text-gray-800">¥{result.amount}</p>
@@ -159,8 +156,8 @@ export default function Home() {
 
           {/* 右端：編集ボタンと貸し借りステータス */}
           <div className="flex items-center">
-            <p className={`mr-4 text-lg font-bold ${result.type === 'borrow' ? 'text-red-500' : 'text-blue-500'}`}>
-              {result.type === 'borrow' ? '借り' : '貸し'}
+            <p className={`mr-4 text-lg font-bold ${result.type === 1 ? 'text-red-500' : 'text-blue-500'}`}>
+              {result.type === 1 ? '貸し' : '借り'}
             </p>
 
             {/* 編集ボタン */}

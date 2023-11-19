@@ -1,7 +1,8 @@
 'use client'
-import React, { createContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
-import { TUser } from '../_types/TUser';
+import React, { createContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
+import { TUser } from '../_libs/types';
 import { useContext } from 'react';
+import { mockUser } from '../_libs/placeholder-data';
 
 type UserUpdateType = Dispatch<SetStateAction<TUser | null>>;
 
@@ -14,6 +15,10 @@ type UserProviderProps = {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<TUser | null>(null);
+
+  useEffect(() => {
+    setUser(mockUser)
+  }, [])
 
   return (
     <UserContext.Provider value={user}>

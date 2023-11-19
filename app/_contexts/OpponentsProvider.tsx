@@ -1,7 +1,8 @@
 'use client'
-import React, { createContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
-import { TOpponent } from '../_types/TOpponent';
+import React, { createContext, useState, useEffect, ReactNode, Dispatch, SetStateAction, use } from 'react';
+import { TOpponent } from '../_libs/types';
 import { useContext } from 'react';
+import { mockOpponents } from '../_libs/placeholder-data';
 
 type OpponentsUpdateType = Dispatch<SetStateAction<TOpponent[] | null>>;
 
@@ -14,6 +15,10 @@ type OpponentsProviderProps = {
 
 export const OpponentsProvider: React.FC<OpponentsProviderProps> = ({ children }) => {
   const [opponents, setOpponents] = useState<TOpponent[] | null>(null);
+
+  useEffect(() => {
+    setOpponents(mockOpponents)
+  }, [])
 
   return (
     <OpponentsContext.Provider value={opponents}>

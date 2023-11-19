@@ -3,28 +3,20 @@ import { useEffect, useState } from 'react';
 import { useUserUpdate } from './_contexts/UserProvider';
 import { useTransactionsUpdate } from './_contexts/TransactionsProvider';
 import { mockTransactions, mockOpponents, mockUser } from './_libs/placeholder-data';
-import { TTransaction } from './_types/TTransaction';
+import { TTransaction, TOpponentSelect, TTypeSelect } from './_libs/types';
+import { TransactionType, CalculateTransactionType } from './_libs/enums';
+import CreateModalComponent from './_components/modal/transaction/CreateModalComponent';
+import EditModalComponent from './_components/modal/transaction/EditModalComponent';
+import SettleConfirmModalComponent from './_components/modal/transaction/SettleConfirmModalComponent';
 
-enum TransactionType {
-  Lend = 1,
-  Borrow = 2,
-}
-
-enum CalculateTransactionType {
-  Pay = 1,
-  Receive = 2,
-}
-
-type SearchType = 'all' | TransactionType.Lend | TransactionType.Borrow;
-type SearchOpponent = 'all' | number;
 
 export default function Home() {
   const setUser = useUserUpdate();
   const setTransactions = useTransactionsUpdate();
 
-  const [searchType, setSearchType] = useState<SearchType>('all');
+  const [searchType, setSearchType] = useState<TTypeSelect>('all');
   const [searchIsSettled, setSearchIsSettled] = useState<boolean>(false);
-  const [sarchOpponent, setSearchOpponent] = useState<SearchOpponent>('all');
+  const [sarchOpponent, setSearchOpponent] = useState<TOpponentSelect>('all');
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
 
@@ -33,7 +25,7 @@ export default function Home() {
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
 
   // チェックのついている取引のIDを格納する配列
-  const [selectedTransactionIds, setSelectedTransactionIds] = useState<number[]>([]);
+  const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
 
   // チェックのついている取引の精算額計算結果を格納する配列
   const [calculateSettled, setCalculateSettled] = useState<{
@@ -42,11 +34,11 @@ export default function Home() {
     type: CalculateTransactionType;
   }[]>([]);
 
-  const handleCheck = (id: number, isChecked: boolean) => {
+  const handleCheck = (transaction: TTransaction, isChecked: boolean) => {
     if (isChecked) {
-      setSelectedTransactionIds([...selectedTransactionIds, id]);
+      setSelectedTransactions([...selectedTransactions, transaction]);
     } else {
-      setSelectedTransactionIds(selectedTransactionIds.filter((selectedId) => selectedId !== id));
+      setSelectedTransactions(selectedTransactions.filter((exitTransaction) => exitTransaction.id !== transaction.id));
     }
   }
 
@@ -71,7 +63,7 @@ export default function Home() {
   };
 
   const handleDeleteConfirm = () => {
-    if (selectedTransactionIds.length === 0) {
+    if (selectedTransactions.length === 0) {
       alert('削除する取引を選択してください');
       return;
     }
@@ -87,17 +79,17 @@ export default function Home() {
     // deleteのAPIを叩く
     // 成功したら、selectedTransactionIdsを空にする。また、取引一覧を更新する。
     // 失敗したら、エラーを表示する。
-    const newTransactions = mockTransactions.filter((transaction) => !selectedTransactionIds.includes(transaction.id));
+    const newTransactions = mockTransactions.filter((transaction) => !selectedTransactions.includes(transaction));
     console.log(newTransactions);
   }
 
   const handleSettleConfirm = () => {
-    if (selectedTransactionIds.length === 0) {
+    if (selectedTransactions.length === 0) {
       alert('清算する取引を選択してください');
       return;
     }
 
-    const calculateTransactions = mockTransactions.filter((transaction) => selectedTransactionIds.includes(transaction.id));
+    const calculateTransactions = mockTransactions.filter((transaction) => selectedTransactions.includes(transaction));
     const calculate: {
       name: string;
       amount: number;
@@ -114,8 +106,8 @@ export default function Home() {
     opponentIds.forEach((opponentId) => {
       const opponentTransactions = calculateTransactions.filter((transaction) => transaction.opponent_id === opponentId);
 
-      const payAmount = opponentTransactions.filter((transaction) => transaction.type === TransactionType.Lend).reduce((sum, transaction) => sum + transaction.amount, 0);
-      const receiveAmount = opponentTransactions.filter((transaction) => transaction.type === TransactionType.Borrow).reduce((sum, transaction) => sum + transaction.amount, 0);
+      const receiveAmount = opponentTransactions.filter((transaction) => transaction.type === TransactionType.Lend).reduce((sum, transaction) => sum + transaction.amount, 0);
+      const payAmount = opponentTransactions.filter((transaction) => transaction.type === TransactionType.Borrow).reduce((sum, transaction) => sum + transaction.amount, 0);
 
       const amount = payAmount - receiveAmount;
 
@@ -148,7 +140,7 @@ export default function Home() {
     // 成功したら、selectedTransactionIdsを空にする。また、取引一覧を更新する。
     // 失敗したら、エラーを表示する。
     const newTransactions = mockTransactions.map((transaction) => {
-      if (selectedTransactionIds.includes(transaction.id)) {
+      if (selectedTransactions.includes(transaction)) {
         return {
           ...transaction,
           is_settled: true,
@@ -179,7 +171,7 @@ export default function Home() {
       <div className="w-11/12 flex justify-between items-center mt-2 mx-auto relative">
         <div>
           {!searchIsSettled && (
-            selectedTransactionIds.length > 0 ? (
+            selectedTransactions.length > 0 ? (
               <button
                 className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
                 onClick={handleSettleConfirm}
@@ -197,7 +189,7 @@ export default function Home() {
           )}
 
           {
-            selectedTransactionIds.length > 0 ? (
+            selectedTransactions.length > 0 ? (
               <button
                 className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
                 onClick={handleDeleteConfirm}
@@ -235,7 +227,7 @@ export default function Home() {
                   id="searchType"
                   className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   value={searchType}
-                  onChange={(e) => setSearchType(e.target.value as SearchType)}
+                  onChange={(e) => setSearchType(e.target.value as TTypeSelect)}
                 >
                   <option value="all">全て</option>
                   <option value="1">貸し</option>
@@ -268,7 +260,7 @@ export default function Home() {
                   id="partnerType"
                   className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   value={sarchOpponent}
-                  onChange={(e) => setSearchOpponent(e.target.value as SearchOpponent)}
+                  onChange={(e) => setSearchOpponent(e.target.value as TOpponentSelect)}
                 >
                   <option value="all">全て</option>
                   {
@@ -290,7 +282,7 @@ export default function Home() {
           <input
             type="checkbox"
             className="form-checkbox h-7 w-7 text-green-500 rounded focus:ring-0 focus:outline-none transition duration-150 ease-in-out"
-            onChange={(e) => handleCheck(result.id, e.target.checked)}
+            onChange={(e) => handleCheck(result, e.target.checked)}
           />
 
           <div className="flex-grow ml-4">
@@ -300,8 +292,8 @@ export default function Home() {
           </div>
 
           <div className="flex items-center">
-            <p className={`mr-4 text-lg font-bold ${result.type === 1 ? 'text-red-500' : 'text-blue-500'}`}>
-              {result.type === 1 ? '貸し' : '借り'}
+            <p className={`mr-4 text-lg font-bold ${result.type === TransactionType.Lend ? 'text-blue-500' : 'text-red-500'}`}>
+              {result.type === TransactionType.Lend ? '貸し' : '借り'}
             </p>
             <button onClick={() => setTargetEditTransaction(result)} className="py-6 px-3 text-xs text-gray-500 bg-gray-200 rounded hover:bg-gray-300">
               編集
@@ -314,36 +306,11 @@ export default function Home() {
 
       {/* 清算確認モーダル */}
       {isOpenSettleConfirm && (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg p-6 relative">
-              <button onClick={handleSettleCancel} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
-              <h2 className="text-lg font-bold mb-4">清算額を確認</h2>
-
-              <table className="min-w-full table-auto text-center">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 border">From</th>
-                    <th className="px-4 py-2 border">To</th>
-                    <th className="px-4 py-2 border">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {calculateSettled.map((settlement, index) => (
-                    <tr key={index}>
-                      <td className="px-4 py-2 border">{settlement.type === CalculateTransactionType.Pay ? 'あなた' : settlement.name}</td>
-                      <td className="px-4 py-2 border">{settlement.type === CalculateTransactionType.Receive ? 'あなた' : settlement.name}</td>
-                      <td className="px-4 py-2 border font-bold">¥{settlement.amount}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              <div className="flex justify-center mt-4">
-                <button onClick={handleSettleCancel} className="px-4 py-2 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
-                <button onClick={handleSettle} className="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">清算する</button>
-              </div>
-            </div>
-          </div>
+        <SettleConfirmModalComponent
+          onClose={handleSettleCancel}
+          onSubmit={handleSettle}
+          transactions={selectedTransactions}
+        />
       )}
 
       {/* 作成用ボタン */}
@@ -357,206 +324,18 @@ export default function Home() {
 
       {/* 取引作成モーダル */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg p-6 relative">
-            <button
-              onClick={() => setIsCreateModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-            >
-              ✖
-            </button>
-            <h2 className="text-lg font-bold mb-4">作成</h2>
-            <form>
-              {/* Name field */}
-              <div className="mb-4">
-                <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-                  項目名
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="項目名"
-                />
-              </div>
-
-              {/* Opponent field */}
-              <div className="mb-4">
-                <label htmlFor="opponent" className="block text-gray-700 text-sm font-bold mb-2">
-                  相手
-                </label>
-                <select
-                  id="opponent"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="all">全て</option>
-                  <option value="1">個人A</option>
-                  <option value="2">個人B</option>
-                </select>
-              </div>
-
-              {/* Is_settled field */}
-              <div className="mb-4">
-                <label htmlFor="is_settled" className="block text-gray-700 text-sm font-bold mb-2">
-                  清算ステータス
-                </label>
-                <select
-                  id="is_settled"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="false">未清算</option>
-                  <option value="true">清算済み</option>
-                </select>
-              </div>
-
-              {/* Type field */}
-              <div className="mb-4">
-                <label htmlFor="type" className="block text-gray-700 text-sm font-bold mb-2">
-                  タイプ
-                </label>
-                <select
-                  id="type"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="all">全て</option>
-                  <option value="1">貸し</option>
-                  <option value="2">借り</option>
-                </select>
-              </div>
-
-              {/* Amount field */}
-              <div className="mb-4">
-                <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">
-                  金額
-                </label>
-                <input
-                  id="amount"
-                  type="number"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="1000"
-                />
-              </div>
-
-              {/* Memo field */}
-              <div className="mb-4">
-                <label htmlFor="memo" className="block text-gray-700 text-sm font-bold mb-2">
-                  メモ
-                </label>
-                <input
-                  id="memo"
-                  type="text"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="メモ"
-                />
-              </div>
-
-              <div className="flex justify-center mt-4">
-                <button onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
-                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">作成する</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <CreateModalComponent
+          onClose={() => setIsCreateModalOpen(false)}
+        />
       )}
 
 
       {/* 編集画面モーダル */}
       {targetEditTransaction && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg p-6 relative">
-            <button className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
-            <h2 className="text-lg font-bold mb-4">編集</h2>
-            <form>
-              {/* Name field */}
-              <div className="mb-4">
-                <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-                  項目名
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="項目名"
-                />
-              </div>
-
-              {/* Opponent field */}
-              <div className="mb-4">
-                <label htmlFor="opponent" className="block text-gray-700 text-sm font-bold mb-2">
-                  相手
-                </label>
-                <select
-                  id="opponent"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="all">全て</option>
-                  <option value="1">個人A</option>
-                  <option value="2">個人B</option>
-                </select>
-              </div>
-
-              {/* Is_settled field */}
-              <div className="mb-4">
-                <label htmlFor="is_settled" className="block text-gray-700 text-sm font-bold mb-2">
-                  清算ステータス
-                </label>
-                <select
-                  id="is_settled"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="false">未清算</option>
-                  <option value="true">清算済み</option>
-                </select>
-              </div>
-
-              {/* Type field */}
-              <div className="mb-4">
-                <label htmlFor="type" className="block text-gray-700 text-sm font-bold mb-2">
-                  タイプ
-                </label>
-                <select
-                  id="type"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="all">全て</option>
-                  <option value="1">貸し</option>
-                  <option value="2">借り</option>
-                </select>
-              </div>
-
-              {/* Amount field */}
-              <div className="mb-4">
-                <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">
-                  金額
-                </label>
-                <input
-                  id="amount"
-                  type="number"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="1000"
-                />
-              </div>
-
-              {/* Memo field */}
-              <div className="mb-4">
-                <label htmlFor="memo" className="block text-gray-700 text-sm font-bold mb-2">
-                  メモ
-                </label>
-                <input
-                  id="memo"
-                  type="text"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="メモ"
-                />
-              </div>
-
-              <div className="flex justify-center mt-4">
-                <button className="px-4 py-2 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
-                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">更新する</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <EditModalComponent
+          transaction={targetEditTransaction}
+          onClose={() => setTargetEditTransaction(null)}
+        />
       )}
     </div>
   );

@@ -12,7 +12,6 @@ const mockTransactions: TTransaction[] = [
   {
     'id': 1,
     'opponent_id': 1,
-    'opponent_name': 'John',
     'is_settled': false,
     'type': 1,
     'name': 'Lunch with John',
@@ -22,7 +21,6 @@ const mockTransactions: TTransaction[] = [
   {
     'id': 2,
     'opponent_id': 2,
-    'opponent_name': 'Jane',
     'is_settled': false,
     'type': 2,
     'name': 'Dinner with Jane',
@@ -32,7 +30,6 @@ const mockTransactions: TTransaction[] = [
   {
     'id': 3,
     'opponent_id': 3,
-    'opponent_name': 'Jack',
     'is_settled': false,
     'type': 1,
     'name': 'Dinner with Jack',
@@ -42,7 +39,6 @@ const mockTransactions: TTransaction[] = [
   {
     'id': 4,
     'opponent_id': 1,
-    'opponent_name': 'John',
     'is_settled': true,
     'type': 2,
     'name': 'Dinner with John',
@@ -52,7 +48,6 @@ const mockTransactions: TTransaction[] = [
   {
     'id': 5,
     'opponent_id': 2,
-    'opponent_name': 'Jane',
     'is_settled': true,
     'type': 1,
     'name': 'Morning coffee',
@@ -62,7 +57,7 @@ const mockTransactions: TTransaction[] = [
   {
     'id': 6,
     'opponent_id': 3,
-    'opponent_name': 'Jack',
+    // 'opponent_name': 'Jack',
     'is_settled': true,
     'type': 2,
     'name': 'Dinner',

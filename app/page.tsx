@@ -1,6 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useUserUpdate } from './_contexts/UserProvider';
+import { useTransactionsUpdate } from './_contexts/TransactionsProvider';
 import { mockTransactions, mockOpponents, mockUser } from './_libs/placeholder-data';
+import { TTransaction } from './_types/TTransaction';
 
 enum TransactionType {
   Lend = 1,
@@ -16,12 +19,16 @@ type SearchType = 'all' | TransactionType.Lend | TransactionType.Borrow;
 type SearchOpponent = 'all' | number;
 
 export default function Home() {
+  const setUser = useUserUpdate();
+  const setTransactions = useTransactionsUpdate();
 
   const [searchType, setSearchType] = useState<SearchType>('all');
   const [searchIsSettled, setSearchIsSettled] = useState<boolean>(false);
   const [sarchOpponent, setSearchOpponent] = useState<SearchOpponent>('all');
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
+
+  const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
 
   // チェックのついている取引のIDを格納する配列
   const [selectedTransactionIds, setSelectedTransactionIds] = useState<number[]>([]);
@@ -112,13 +119,13 @@ export default function Home() {
 
       if (amount > 0) {
         calculate.push({
-          name: calculateTransactions.find((transaction) => transaction.opponent_id === opponentId)?.opponent_name || '',
+          name: mockOpponents.find((opponent) => opponent.id === opponentId)?.name || '',
           amount,
           type: CalculateTransactionType.Pay,
         });
       } else if (amount < 0) {
         calculate.push({
-          name: calculateTransactions.find((transaction) => transaction.opponent_id === opponentId)?.opponent_name || '',
+          name: mockOpponents.find((opponent) => opponent.id === opponentId)?.name || '',
           amount: Math.abs(amount),
           type: CalculateTransactionType.Receive,
         });
@@ -151,13 +158,19 @@ export default function Home() {
 
   const user = mockUser;
 
+  useEffect(() => {
+    setUser?.(user);
+    setTransactions?.(mockTransactions);
+  }, [setUser, setTransactions]);
+
   return (
     <div>
+      {/* ヘッダー */}
       <div className="shadow p-4 py-3 flex items-center bg-green-500">
         <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
           <span className="text-sm text-white">画</span>
         </div>
-        <h1 className="ml-4 text-lg text-white font-medium">杉峯悠太</h1>
+        <h1 className="ml-4 text-lg text-white font-medium">{ user.name }</h1>
       </div>
 
       {/* 検索条件の表示 */}
@@ -209,7 +222,7 @@ export default function Home() {
         </button>
 
         {isSearchVisible && (
-          <div className="bg-white p-4 shadow-md w-2/3 absolute top-8 right-0 rounded-sm">
+          <div className="bg-white p-4 shadow-md w-2/3 absolute top-8 right-0 rounded-md">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {/* 取引タイプ選択 */}
               <div>
@@ -268,7 +281,6 @@ export default function Home() {
         )}
       </div>
 
-
       {/* 検索結果の一覧 */}
       <div className="flex-1 overflow-y-auto p-4">
       {results.map((result) => (
@@ -281,7 +293,7 @@ export default function Home() {
 
           <div className="flex-grow ml-4">
             <h3 className="text-sm font-semibold text-gray-800">{result.name}</h3>
-            <p className="text-xs text-gray-600">相手: {result.opponent_name}</p>
+            <p className="text-xs text-gray-600">相手: {mockOpponents.find((opponent) => opponent.id === result.opponent_id)?.name}</p>
             <p className="text-lg font-bold text-gray-800">¥{result.amount}</p>
           </div>
 
@@ -289,7 +301,7 @@ export default function Home() {
             <p className={`mr-4 text-lg font-bold ${result.type === 1 ? 'text-red-500' : 'text-blue-500'}`}>
               {result.type === 1 ? '貸し' : '借り'}
             </p>
-            <button className="py-6 px-3 text-xs text-gray-500 bg-gray-200 rounded hover:bg-gray-300">
+            <button onClick={() => setTargetEditTransaction(result)} className="py-6 px-3 text-xs text-gray-500 bg-gray-200 rounded hover:bg-gray-300">
               編集
             </button>
           </div>
@@ -299,10 +311,9 @@ export default function Home() {
       </div>
 
       {/* 清算確認モーダル */}
-      {
-        isOpenSettleConfirm && (
+      {isOpenSettleConfirm && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg py-4 px-2 relative">
+            <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg p-6 relative">
               <button onClick={handleSettleCancel} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
               <h2 className="text-lg font-bold mb-4">清算額を確認</h2>
 
@@ -331,8 +342,107 @@ export default function Home() {
               </div>
             </div>
           </div>
-        )
-      }
+      )}
+
+
+      {/* 編集画面モーダル */}
+      {targetEditTransaction && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg p-6 relative">
+            <button className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
+            <h2 className="text-lg font-bold mb-4">編集</h2>
+            <form>
+              {/* Name field */}
+              <div className="mb-4">
+                <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
+                  項目名
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="項目名"
+                />
+              </div>
+
+              {/* Opponent field */}
+              <div className="mb-4">
+                <label htmlFor="opponent" className="block text-gray-700 text-sm font-bold mb-2">
+                  相手
+                </label>
+                <select
+                  id="opponent"
+                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="all">全て</option>
+                  <option value="1">個人A</option>
+                  <option value="2">個人B</option>
+                </select>
+              </div>
+
+              {/* Is_settled field */}
+              <div className="mb-4">
+                <label htmlFor="is_settled" className="block text-gray-700 text-sm font-bold mb-2">
+                  清算ステータス
+                </label>
+                <select
+                  id="is_settled"
+                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="false">未清算</option>
+                  <option value="true">清算済み</option>
+                </select>
+              </div>
+
+              {/* Type field */}
+              <div className="mb-4">
+                <label htmlFor="type" className="block text-gray-700 text-sm font-bold mb-2">
+                  タイプ
+                </label>
+                <select
+                  id="type"
+                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="all">全て</option>
+                  <option value="1">貸し</option>
+                  <option value="2">借り</option>
+                </select>
+              </div>
+
+              {/* Amount field */}
+              <div className="mb-4">
+                <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">
+                  金額
+                </label>
+                <input
+                  id="amount"
+                  type="number"
+                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="1000"
+                />
+              </div>
+
+              {/* Memo field */}
+              <div className="mb-4">
+                <label htmlFor="memo" className="block text-gray-700 text-sm font-bold mb-2">
+                  メモ
+                </label>
+                <input
+                  id="memo"
+                  type="text"
+                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="メモ"
+                />
+              </div>
+
+              <div className="flex justify-center mt-4">
+                <button className="px-4 py-2 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
+                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">更新する</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

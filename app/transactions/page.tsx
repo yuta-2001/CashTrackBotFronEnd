@@ -1,13 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useUserUpdate } from './_contexts/UserProvider';
-import { useTransactionsUpdate } from './_contexts/TransactionsProvider';
-import { mockTransactions, mockOpponents, mockUser } from './_libs/placeholder-data';
-import { TTransaction, TOpponentSelect, TTypeSelect } from './_libs/types';
-import { TransactionType, CalculateTransactionType } from './_libs/enums';
-import CreateModalComponent from './_components/modal/transaction/CreateModalComponent';
-import EditModalComponent from './_components/modal/transaction/EditModalComponent';
-import SettleConfirmModalComponent from './_components/modal/transaction/SettleConfirmModalComponent';
+import { useUserUpdate } from '../_contexts/UserProvider';
+import { useTransactionsUpdate } from '../_contexts/TransactionsProvider';
+import { mockTransactions, mockOpponents, mockUser } from '../_libs/placeholder-data';
+import { TTransaction, TOpponentSelect, TTypeSelect } from '../_libs/types';
+import { TransactionType, CalculateTransactionType } from '../_libs/enums';
+import CreateModalComponent from '../_components/modal/transaction/CreateModalComponent';
+import EditModalComponent from '../_components/modal/transaction/EditModalComponent';
+import SettleConfirmModalComponent from '../_components/modal/transaction/SettleConfirmModalComponent';
+import HeaderComponent from '../_components/common/HeaderComponent';
+import SearchBoxModalComponent from '../_components/modal/transaction/SearchBoxModalComponent';
 
 
 export default function Home() {
@@ -106,22 +108,22 @@ export default function Home() {
     opponentIds.forEach((opponentId) => {
       const opponentTransactions = calculateTransactions.filter((transaction) => transaction.opponent_id === opponentId);
 
-      const receiveAmount = opponentTransactions.filter((transaction) => transaction.type === TransactionType.Lend).reduce((sum, transaction) => sum + transaction.amount, 0);
       const payAmount = opponentTransactions.filter((transaction) => transaction.type === TransactionType.Borrow).reduce((sum, transaction) => sum + transaction.amount, 0);
+      const receiveAmount = opponentTransactions.filter((transaction) => transaction.type === TransactionType.Lend).reduce((sum, transaction) => sum + transaction.amount, 0);
 
-      const amount = payAmount - receiveAmount;
+      const amount = receiveAmount - payAmount;
 
       if (amount > 0) {
         calculate.push({
           name: mockOpponents.find((opponent) => opponent.id === opponentId)?.name || '',
           amount,
-          type: CalculateTransactionType.Pay,
+          type: CalculateTransactionType.Receive,
         });
       } else if (amount < 0) {
         calculate.push({
           name: mockOpponents.find((opponent) => opponent.id === opponentId)?.name || '',
           amount: Math.abs(amount),
-          type: CalculateTransactionType.Receive,
+          type: CalculateTransactionType.Pay,
         });
       }
     });
@@ -160,12 +162,7 @@ export default function Home() {
   return (
     <div>
       {/* ヘッダー */}
-      <div className="shadow p-4 py-3 flex items-center bg-green-500">
-        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-          <span className="text-sm text-white">画</span>
-        </div>
-        <h1 className="ml-4 text-lg text-white font-medium">{ user.name }</h1>
-      </div>
+      <HeaderComponent user={mockUser} />
 
       {/* 検索条件の表示 */}
       <div className="w-11/12 flex justify-between items-center mt-2 mx-auto relative">
@@ -216,62 +213,15 @@ export default function Home() {
         </button>
 
         {isSearchVisible && (
-          <div className="bg-white p-4 shadow-md w-2/3 absolute top-8 right-0 rounded-md">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {/* 取引タイプ選択 */}
-              <div>
-                <label htmlFor="searchType" className="text-sm font-bold text-gray-700">
-                  取引タイプ
-                </label>
-                <select
-                  id="searchType"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  value={searchType}
-                  onChange={(e) => setSearchType(e.target.value as TTypeSelect)}
-                >
-                  <option value="all">全て</option>
-                  <option value="1">貸し</option>
-                  <option value="2">借り</option>
-                </select>
-              </div>
-
-              {/* 清算ステータス選択 */}
-              <div>
-                <label htmlFor="settlementStatus" className="text-sm font-bold text-gray-700">
-                  清算ステータス
-                </label>
-                <select
-                  id="settlementStatus"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  value={searchIsSettled ? '1' : '0'}
-                  onChange={(e) => setSearchIsSettled(e.target.value === '1')}
-                >
-                  <option value="0">未清算</option>
-                  <option value="1">清算済み</option>
-                </select>
-              </div>
-
-              {/* 相手タイプ選択 */}
-              <div>
-                <label htmlFor="partnerType" className="text-sm font-bold text-gray-700">
-                  相手タイプ
-                </label>
-                <select
-                  id="partnerType"
-                  className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  value={sarchOpponent}
-                  onChange={(e) => setSearchOpponent(e.target.value as TOpponentSelect)}
-                >
-                  <option value="all">全て</option>
-                  {
-                    mockOpponents.map((opponent) => (
-                      <option key={opponent.id} value={opponent.id}>{opponent.name}</option>
-                    ))
-                  }
-                </select>
-              </div>
-            </div>
-          </div>
+          <SearchBoxModalComponent
+            opponents={mockOpponents}
+            searchType={searchType}
+            setSearchType={setSearchType}
+            searchIsSettled={searchIsSettled}
+            setSearchIsSettled={setSearchIsSettled}
+            sarchOpponent={sarchOpponent}
+            setSearchOpponent={setSearchOpponent}
+          />
         )}
       </div>
 
@@ -309,7 +259,7 @@ export default function Home() {
         <SettleConfirmModalComponent
           onClose={handleSettleCancel}
           onSubmit={handleSettle}
-          transactions={selectedTransactions}
+          calculateResults={calculateSettled}
         />
       )}
 
@@ -328,7 +278,6 @@ export default function Home() {
           onClose={() => setIsCreateModalOpen(false)}
         />
       )}
-
 
       {/* 編集画面モーダル */}
       {targetEditTransaction && (

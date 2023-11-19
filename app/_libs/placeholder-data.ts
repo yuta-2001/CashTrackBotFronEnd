@@ -1,6 +1,4 @@
-import { TUser } from '../_types/TUser';
-import { TTransaction } from '../_types/TTransaction';
-import { TOpponent } from '../_types/TOpponent';
+import { TUser, TTransaction, TOpponent } from '../_libs/types';
 
 const mockUser: TUser = {
   'name': 'Yuta',

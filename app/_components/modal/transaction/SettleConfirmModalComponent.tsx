@@ -1,14 +1,14 @@
-import { TTransaction } from '../../../_libs/types';
+import { TTransaction, TCalculateResult } from '../../../_libs/types';
 import { CalculateTransactionType } from '../../../_libs/enums';
 
 type SettleConfirmModalComponentProps = {
   onClose: () => void;
   onSubmit: () => void;
-  transactions: TTransaction[];
+  calculateResults: TCalculateResult[];
 }
 
 const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) => {
-  const { onClose, onSubmit, transactions } = props;
+  const { onClose, onSubmit, calculateResults } = props;
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
@@ -25,7 +25,7 @@ const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) =>
             </tr>
           </thead>
           <tbody>
-            {transactions.map((settlement, index) => (
+            {calculateResults.map((settlement, index) => (
               <tr key={index}>
                 <td className="px-4 py-2 border">{settlement.type === CalculateTransactionType.Pay ? 'あなた' : settlement.name}</td>
                 <td className="px-4 py-2 border">{settlement.type === CalculateTransactionType.Receive ? 'あなた' : settlement.name}</td>

@@ -1,4 +1,4 @@
-import { TransactionType } from './enums';
+import { TransactionType, CalculateTransactionType } from './enums';
 
 export type TOpponent = {
   'id': number,
@@ -18,6 +18,12 @@ export type TTransaction = {
 export type TUser = {
   'name': string,
   'profile_image': string,
+}
+
+export type TCalculateResult = {
+  'name': string,
+  'amount': number,
+  'type': CalculateTransactionType,
 }
 
 

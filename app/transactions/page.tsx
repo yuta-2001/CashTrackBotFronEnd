@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useUserUpdate } from '../_contexts/UserProvider';
-import { useTransactionsUpdate } from '../_contexts/TransactionsProvider';
-import { mockTransactions, mockOpponents, mockUser } from '../_libs/placeholder-data';
-import { TTransaction, TOpponentSelect, TTypeSelect } from '../_libs/types';
+import { useUser } from '../_contexts/UserProvider';
+import { useTransactions } from '../_contexts/TransactionsProvider';
+import { useOpponents } from '../_contexts/OpponentsProvider';
+// import { mockTransactions, mockOpponents, mockUser } from '../_libs/placeholder-data';
+import { TTransaction, TOpponentSelect, TTypeSelect, TCalculateResult } from '../_libs/types';
 import { TransactionType, CalculateTransactionType } from '../_libs/enums';
 import CreateModalComponent from '../_components/modal/transaction/CreateModalComponent';
 import EditModalComponent from '../_components/modal/transaction/EditModalComponent';
@@ -13,28 +14,19 @@ import SearchBoxModalComponent from '../_components/modal/transaction/SearchBoxM
 
 
 export default function Home() {
-  const setUser = useUserUpdate();
-  const setTransactions = useTransactionsUpdate();
-
   const [searchType, setSearchType] = useState<TTypeSelect>('all');
   const [searchIsSettled, setSearchIsSettled] = useState<boolean>(false);
   const [sarchOpponent, setSearchOpponent] = useState<TOpponentSelect>('all');
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
-
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
-
-  // チェックのついている取引のIDを格納する配列
   const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
+  const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
 
-  // チェックのついている取引の精算額計算結果を格納する配列
-  const [calculateSettled, setCalculateSettled] = useState<{
-    name: string;
-    amount: number;
-    type: CalculateTransactionType;
-  }[]>([]);
+  const user = useUser();
+  const transactions = useTransactions();
+  const opponents = useOpponents();
 
   const handleCheck = (transaction: TTransaction, isChecked: boolean) => {
     if (isChecked) {
@@ -44,7 +36,7 @@ export default function Home() {
     }
   }
 
-  const results = mockTransactions.filter((transaction) => {
+  const results = transactions?.filter((transaction) => {
     if (searchType !== 'all' && transaction.type !== Number(searchType)) {
       return false;
     }
@@ -81,17 +73,29 @@ export default function Home() {
     // deleteのAPIを叩く
     // 成功したら、selectedTransactionIdsを空にする。また、取引一覧を更新する。
     // 失敗したら、エラーを表示する。
-    const newTransactions = mockTransactions.filter((transaction) => !selectedTransactions.includes(transaction));
+    if (transactions === null) {
+      return;
+    }
+
+    const newTransactions = transactions.filter((transaction) => !selectedTransactions.includes(transaction));
     console.log(newTransactions);
   }
 
   const handleSettleConfirm = () => {
+    if (transactions === null) {
+      return;
+    }
+
+    if (opponents === null) {
+      return;
+    }
+
     if (selectedTransactions.length === 0) {
       alert('清算する取引を選択してください');
       return;
     }
 
-    const calculateTransactions = mockTransactions.filter((transaction) => selectedTransactions.includes(transaction));
+    const calculateTransactions = transactions.filter((transaction) => selectedTransactions.includes(transaction));
     const calculate: {
       name: string;
       amount: number;
@@ -115,13 +119,13 @@ export default function Home() {
 
       if (amount > 0) {
         calculate.push({
-          name: mockOpponents.find((opponent) => opponent.id === opponentId)?.name || '',
+          name: opponents.find((opponent) => opponent.id === opponentId)?.name || '',
           amount,
           type: CalculateTransactionType.Receive,
         });
       } else if (amount < 0) {
         calculate.push({
-          name: mockOpponents.find((opponent) => opponent.id === opponentId)?.name || '',
+          name: opponents.find((opponent) => opponent.id === opponentId)?.name || '',
           amount: Math.abs(amount),
           type: CalculateTransactionType.Pay,
         });
@@ -138,10 +142,14 @@ export default function Home() {
   }
 
   const handleSettle = () => {
+    if (transactions === null) {
+      return;
+    }
+
     // settleのAPIを叩く
     // 成功したら、selectedTransactionIdsを空にする。また、取引一覧を更新する。
     // 失敗したら、エラーを表示する。
-    const newTransactions = mockTransactions.map((transaction) => {
+    const newTransactions = transactions.map((transaction) => {
       if (selectedTransactions.includes(transaction)) {
         return {
           ...transaction,
@@ -152,17 +160,11 @@ export default function Home() {
     });
   }
 
-  const user = mockUser;
-
-  useEffect(() => {
-    setUser?.(user);
-    setTransactions?.(mockTransactions);
-  }, [setUser, setTransactions]);
 
   return (
     <div>
       {/* ヘッダー */}
-      <HeaderComponent user={mockUser} />
+      <HeaderComponent user={user} />
 
       {/* 検索条件の表示 */}
       <div className="w-11/12 flex justify-between items-center mt-2 mx-auto relative">
@@ -214,7 +216,7 @@ export default function Home() {
 
         {isSearchVisible && (
           <SearchBoxModalComponent
-            opponents={mockOpponents}
+            opponents={opponents}
             searchType={searchType}
             setSearchType={setSearchType}
             searchIsSettled={searchIsSettled}
@@ -227,7 +229,7 @@ export default function Home() {
 
       {/* 検索結果の一覧 */}
       <div className="flex-1 overflow-y-auto p-4">
-      {results.map((result) => (
+      {results?.map((result) => (
         <div key={result.id} className="mb-4 p-4 bg-white rounded-lg shadow flex items-center justify-between">
           <input
             type="checkbox"
@@ -237,7 +239,7 @@ export default function Home() {
 
           <div className="flex-grow ml-4">
             <h3 className="text-sm font-semibold text-gray-800">{result.name}</h3>
-            <p className="text-xs text-gray-600">相手: {mockOpponents.find((opponent) => opponent.id === result.opponent_id)?.name}</p>
+            <p className="text-xs text-gray-600">相手: {opponents?.find((opponent) => opponent.id === result.opponent_id)?.name}</p>
             <p className="text-lg font-bold text-gray-800">¥{result.amount}</p>
           </div>
 

@@ -1,7 +1,7 @@
 import { TUser } from '../../_libs/types'
 
 type HeaderComponentProps = {
-  user: TUser
+  user: TUser | null
 }
 
 const HeaderComponent = (props: HeaderComponentProps) => {

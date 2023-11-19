@@ -1,7 +1,7 @@
 import { TTypeSelect, TOpponent, TOpponentSelect } from "@/app/_libs/types";
 
 type SearchBoxModalComponentProps = {
-  opponents : TOpponent[];
+  opponents : TOpponent[] | null;
   searchType: TTypeSelect;
   setSearchType: (type: TTypeSelect) => void;
   searchIsSettled: boolean;
@@ -12,7 +12,7 @@ type SearchBoxModalComponentProps = {
 
 const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
   const {
-    opponents: mockOpponents,
+    opponents,
     searchType,
     setSearchType,
     searchIsSettled,
@@ -70,7 +70,7 @@ const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
           >
             <option value="all">全て</option>
             {
-              mockOpponents.map((opponent) => (
+              opponents?.map((opponent) => (
                 <option key={opponent.id} value={opponent.id}>{opponent.name}</option>
               ))
             }

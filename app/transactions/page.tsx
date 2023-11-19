@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useUser } from '../_contexts/UserProvider';
 import { useTransactions } from '../_contexts/TransactionsProvider';
 import { useOpponents } from '../_contexts/OpponentsProvider';
-// import { mockTransactions, mockOpponents, mockUser } from '../_libs/placeholder-data';
 import { TTransaction, TOpponentSelect, TTypeSelect, TCalculateResult } from '../_libs/types';
 import { TransactionType, CalculateTransactionType } from '../_libs/enums';
 import CreateModalComponent from '../_components/modal/transaction/CreateModalComponent';
@@ -253,10 +252,8 @@ export default function Home() {
           </div>
         </div>
       ))}
-
       </div>
 
-      {/* 清算確認モーダル */}
       {isOpenSettleConfirm && (
         <SettleConfirmModalComponent
           onClose={handleSettleCancel}
@@ -265,7 +262,6 @@ export default function Home() {
         />
       )}
 
-      {/* 作成用ボタン */}
       <button
         onClick={() => setIsCreateModalOpen(true)} 
         className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600 text-white font-bold w-10 h-10 rounded-full leading-none text-3xl "
@@ -274,14 +270,12 @@ export default function Home() {
         +
       </button>
 
-      {/* 取引作成モーダル */}
       {isCreateModalOpen && (
         <CreateModalComponent
           onClose={() => setIsCreateModalOpen(false)}
         />
       )}
 
-      {/* 編集画面モーダル */}
       {targetEditTransaction && (
         <EditModalComponent
           transaction={targetEditTransaction}

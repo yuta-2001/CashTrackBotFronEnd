@@ -2,13 +2,13 @@ import { TUser } from '../_types/TUser';
 import { TTransaction } from '../_types/TTransaction';
 import { TOpponent } from '../_types/TOpponent';
 
-const user: TUser = {
+const mockUser: TUser = {
   'name': 'Yuta',
   'profile_image': 'aaa',
 }
 
 
-const transactions: TTransaction[] = [
+const mockTransactions: TTransaction[] = [
   {
     'id': 1,
     'opponent_id': 1,
@@ -72,7 +72,7 @@ const transactions: TTransaction[] = [
 ];
 
 
-const opponents: TOpponent[] = [
+const mockOpponents: TOpponent[] = [
   {
     'id': 1,
     'name': 'John',
@@ -87,4 +87,4 @@ const opponents: TOpponent[] = [
   }
 ];
 
-export { user, transactions, opponents };
+export { mockUser, mockTransactions, mockOpponents };

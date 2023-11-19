@@ -6,6 +6,12 @@ enum TransactionType {
   Lend = 1,
   Borrow = 2,
 }
+
+enum CalculateTransactionType {
+  Pay = 1,
+  Receive = 2,
+}
+
 type SearchType = 'all' | TransactionType.Lend | TransactionType.Borrow;
 type SearchOpponent = 'all' | number;
 
@@ -19,6 +25,13 @@ export default function Home() {
 
   // チェックのついている取引のIDを格納する配列
   const [selectedTransactionIds, setSelectedTransactionIds] = useState<number[]>([]);
+
+  // チェックのついている取引の精算額計算結果を格納する配列
+  const [calculateSettled, setCalculateSettled] = useState<{
+    name: string;
+    amount: number;
+    type: CalculateTransactionType;
+  }[]>([]);
 
   const handleCheck = (id: number, isChecked: boolean) => {
     if (isChecked) {
@@ -69,14 +82,56 @@ export default function Home() {
     console.log(newTransactions);
   }
 
-
   const handleSettleConfirm = () => {
     if (selectedTransactionIds.length === 0) {
       alert('清算する取引を選択してください');
       return;
     }
 
+    const calculateTransactions = mockTransactions.filter((transaction) => selectedTransactionIds.includes(transaction.id));
+    const calculate: {
+      name: string;
+      amount: number;
+      type: CalculateTransactionType;
+    }[] = [];
+
+    const opponentIds: number[] = [];
+    calculateTransactions.forEach((transaction) => {
+      if (!opponentIds.includes(transaction.opponent_id)) {
+        opponentIds.push(transaction.opponent_id);
+      }
+    });
+
+    opponentIds.forEach((opponentId) => {
+      const opponentTransactions = calculateTransactions.filter((transaction) => transaction.opponent_id === opponentId);
+
+      const payAmount = opponentTransactions.filter((transaction) => transaction.type === TransactionType.Lend).reduce((sum, transaction) => sum + transaction.amount, 0);
+      const receiveAmount = opponentTransactions.filter((transaction) => transaction.type === TransactionType.Borrow).reduce((sum, transaction) => sum + transaction.amount, 0);
+
+      const amount = payAmount - receiveAmount;
+
+      if (amount > 0) {
+        calculate.push({
+          name: calculateTransactions.find((transaction) => transaction.opponent_id === opponentId)?.opponent_name || '',
+          amount,
+          type: CalculateTransactionType.Pay,
+        });
+      } else if (amount < 0) {
+        calculate.push({
+          name: calculateTransactions.find((transaction) => transaction.opponent_id === opponentId)?.opponent_name || '',
+          amount: Math.abs(amount),
+          type: CalculateTransactionType.Receive,
+        });
+      }
+    });
+
+    setCalculateSettled(calculate);
     setIsOpenSettleConfirm(true);
+  }
+
+  const handleSettleCancel = () => {
+    setIsOpenSettleConfirm(false);
+    setCalculateSettled([]);
   }
 
   const handleSettle = () => {
@@ -93,12 +148,6 @@ export default function Home() {
       return transaction;
     });
   }
-
-  const calculateSettled = [
-    { name: 'YUI', amount: 500, type: 'pay' },
-    { name: 'TAKESHI', amount: 300, type: 'receive' },
-    // 他のデータ...
-  ];
 
   const user = mockUser;
 
@@ -224,33 +273,22 @@ export default function Home() {
       <div className="flex-1 overflow-y-auto p-4">
       {results.map((result) => (
         <div key={result.id} className="mb-4 p-4 bg-white rounded-lg shadow flex items-center justify-between">
-          {/* 左端：チェックボックス */}
-          {/* チェックがついた場合は配列に格納、チェックが外れた場合は配列から取り出す */}
           <input
             type="checkbox"
             className="form-checkbox h-7 w-7 text-green-500 rounded focus:ring-0 focus:outline-none transition duration-150 ease-in-out"
             onChange={(e) => handleCheck(result.id, e.target.checked)}
           />
 
-          {/* 中央の内容 */}
           <div className="flex-grow ml-4">
-            {/* 項目名 */}
             <h3 className="text-sm font-semibold text-gray-800">{result.name}</h3>
-
-            {/* 相手 */}
             <p className="text-xs text-gray-600">相手: {result.opponent_name}</p>
-
-            {/* 金額 */}
             <p className="text-lg font-bold text-gray-800">¥{result.amount}</p>
           </div>
 
-          {/* 右端：編集ボタンと貸し借りステータス */}
           <div className="flex items-center">
             <p className={`mr-4 text-lg font-bold ${result.type === 1 ? 'text-red-500' : 'text-blue-500'}`}>
               {result.type === 1 ? '貸し' : '借り'}
             </p>
-
-            {/* 編集ボタン */}
             <button className="py-6 px-3 text-xs text-gray-500 bg-gray-200 rounded hover:bg-gray-300">
               編集
             </button>
@@ -265,7 +303,7 @@ export default function Home() {
         isOpenSettleConfirm && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
             <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg py-4 px-2 relative">
-              <button onClick={() => setIsOpenSettleConfirm(false)} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
+              <button onClick={handleSettleCancel} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
               <h2 className="text-lg font-bold mb-4">清算額を確認</h2>
 
               <table className="min-w-full table-auto text-center">
@@ -279,8 +317,8 @@ export default function Home() {
                 <tbody>
                   {calculateSettled.map((settlement, index) => (
                     <tr key={index}>
-                      <td className="px-4 py-2 border">{settlement.type === 'pay' ? 'あなた' : settlement.name}</td>
-                      <td className="px-4 py-2 border">{settlement.type === 'receive' ? 'あなた' : settlement.name}</td>
+                      <td className="px-4 py-2 border">{settlement.type === CalculateTransactionType.Pay ? 'あなた' : settlement.name}</td>
+                      <td className="px-4 py-2 border">{settlement.type === CalculateTransactionType.Receive ? 'あなた' : settlement.name}</td>
                       <td className="px-4 py-2 border font-bold">¥{settlement.amount}</td>
                     </tr>
                   ))}
@@ -288,7 +326,7 @@ export default function Home() {
               </table>
 
               <div className="flex justify-center mt-4">
-                <button onClick={() => setIsOpenSettleConfirm(false)} className="px-4 py-2 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
+                <button onClick={handleSettleCancel} className="px-4 py-2 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
                 <button onClick={handleSettle} className="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">清算する</button>
               </div>
             </div>

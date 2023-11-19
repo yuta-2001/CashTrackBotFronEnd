@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { mockTransactions, mockOpponents } from './_libs/placeholder-data';
+import { mockTransactions, mockOpponents, mockUser } from './_libs/placeholder-data';
 
 enum TransactionType {
   Lend = 1,
@@ -15,6 +15,18 @@ export default function Home() {
   const [searchIsSettled, setSearchIsSettled] = useState<boolean>(false);
   const [sarchOpponent, setSearchOpponent] = useState<SearchOpponent>('all');
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
+  const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
+
+  // チェックのついている取引のIDを格納する配列
+  const [selectedTransactionIds, setSelectedTransactionIds] = useState<number[]>([]);
+
+  const handleCheck = (id: number, isChecked: boolean) => {
+    if (isChecked) {
+      setSelectedTransactionIds([...selectedTransactionIds, id]);
+    } else {
+      setSelectedTransactionIds(selectedTransactionIds.filter((selectedId) => selectedId !== id));
+    }
+  }
 
   const results = mockTransactions.filter((transaction) => {
     if (searchType !== 'all' && transaction.type !== Number(searchType)) {
@@ -36,6 +48,60 @@ export default function Home() {
     setIsSearchVisible(!isSearchVisible);
   };
 
+  const handleDeleteConfirm = () => {
+    if (selectedTransactionIds.length === 0) {
+      alert('削除する取引を選択してください');
+      return;
+    }
+
+    if (!confirm('選択した取引を削除しますか？')) {
+      return;
+    }
+
+    handleDelete();
+  };
+
+  const handleDelete = () => {
+    // deleteのAPIを叩く
+    // 成功したら、selectedTransactionIdsを空にする。また、取引一覧を更新する。
+    // 失敗したら、エラーを表示する。
+    const newTransactions = mockTransactions.filter((transaction) => !selectedTransactionIds.includes(transaction.id));
+    console.log(newTransactions);
+  }
+
+
+  const handleSettleConfirm = () => {
+    if (selectedTransactionIds.length === 0) {
+      alert('清算する取引を選択してください');
+      return;
+    }
+
+    setIsOpenSettleConfirm(true);
+  }
+
+  const handleSettle = () => {
+    // settleのAPIを叩く
+    // 成功したら、selectedTransactionIdsを空にする。また、取引一覧を更新する。
+    // 失敗したら、エラーを表示する。
+    const newTransactions = mockTransactions.map((transaction) => {
+      if (selectedTransactionIds.includes(transaction.id)) {
+        return {
+          ...transaction,
+          is_settled: true,
+        };
+      }
+      return transaction;
+    });
+  }
+
+  const calculateSettled = [
+    { name: 'YUI', amount: 500, type: 'pay' },
+    { name: 'TAKESHI', amount: 300, type: 'receive' },
+    // 他のデータ...
+  ];
+
+  const user = mockUser;
+
   return (
     <div>
       <div className="shadow p-4 py-3 flex items-center bg-green-500">
@@ -49,18 +115,40 @@ export default function Home() {
       <div className="w-11/12 flex justify-between items-center mt-2 mx-auto relative">
         <div>
           {!searchIsSettled && (
-            <button
-            className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
-            >
-              清算額を計算
-            </button>
+            selectedTransactionIds.length > 0 ? (
+              <button
+                className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
+                onClick={handleSettleConfirm}
+              >
+                清算額を計算
+              </button>
+            ) : (
+              <button
+                className="px-3 py-1 mr-2 bg-gray-300 text-white text-xs font-semibold rounded-lg shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
+                disabled
+              >
+                清算額を計算
+              </button>
+            )
           )}
 
-          <button
-            className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
-          >
-            削除
-          </button>
+          {
+            selectedTransactionIds.length > 0 ? (
+              <button
+                className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
+                onClick={handleDeleteConfirm}
+              >
+                選択した取引を削除
+              </button>
+            ) : (
+              <button
+                className="px-3 py-1 mr-2 bg-gray-300 text-white text-xs font-semibold rounded-lg shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
+                disabled
+              >
+                選択した取引を削除
+              </button>
+            )
+          }
         </div>
 
         {/* 条件変更ボタン */}
@@ -121,7 +209,7 @@ export default function Home() {
                   <option value="all">全て</option>
                   {
                     mockOpponents.map((opponent) => (
-                      <option value={opponent.id}>{opponent.name}</option>
+                      <option key={opponent.id} value={opponent.id}>{opponent.name}</option>
                     ))
                   }
                 </select>
@@ -137,9 +225,11 @@ export default function Home() {
       {results.map((result) => (
         <div key={result.id} className="mb-4 p-4 bg-white rounded-lg shadow flex items-center justify-between">
           {/* 左端：チェックボックス */}
+          {/* チェックがついた場合は配列に格納、チェックが外れた場合は配列から取り出す */}
           <input
             type="checkbox"
             className="form-checkbox h-7 w-7 text-green-500 rounded focus:ring-0 focus:outline-none transition duration-150 ease-in-out"
+            onChange={(e) => handleCheck(result.id, e.target.checked)}
           />
 
           {/* 中央の内容 */}
@@ -169,6 +259,42 @@ export default function Home() {
       ))}
 
       </div>
+
+      {/* 清算確認モーダル */}
+      {
+        isOpenSettleConfirm && (
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg py-4 px-2 relative">
+              <button onClick={() => setIsOpenSettleConfirm(false)} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
+              <h2 className="text-lg font-bold mb-4">清算額を確認</h2>
+
+              <table className="min-w-full table-auto text-center">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 border">From</th>
+                    <th className="px-4 py-2 border">To</th>
+                    <th className="px-4 py-2 border">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {calculateSettled.map((settlement, index) => (
+                    <tr key={index}>
+                      <td className="px-4 py-2 border">{settlement.type === 'pay' ? 'あなた' : settlement.name}</td>
+                      <td className="px-4 py-2 border">{settlement.type === 'receive' ? 'あなた' : settlement.name}</td>
+                      <td className="px-4 py-2 border font-bold">¥{settlement.amount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="flex justify-center mt-4">
+                <button onClick={() => setIsOpenSettleConfirm(false)} className="px-4 py-2 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
+                <button onClick={handleSettle} className="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">清算する</button>
+              </div>
+            </div>
+          </div>
+        )
+      }
     </div>
   );
 };

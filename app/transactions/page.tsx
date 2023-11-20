@@ -4,14 +4,12 @@ import TransactionsPageContent from '../_pages/TransactionsPageContent';
 
 export default function TransactionsPage() {
   const user = mockUser;
-  const transactions = mockTransactions;
   const opponents = mockOpponents;
 
   return (
     <>
       <HeaderComponent user={user} />
       <TransactionsPageContent
-        transactions={transactions}
         opponents={opponents}
       />
     </>

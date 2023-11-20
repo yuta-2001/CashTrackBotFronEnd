@@ -1,24 +1,16 @@
-import { TTypeSelect, TOpponent, TOpponentSelect } from "@/app/_libs/types";
+import { TTypeSelect, TOpponent, TOpponentSelect, TSearchCondition } from "@/app/_libs/types";
 
 type SearchBoxModalComponentProps = {
   opponents : TOpponent[] | null;
-  searchType: TTypeSelect;
-  setSearchType: (type: TTypeSelect) => void;
-  searchIsSettled: boolean;
-  setSearchIsSettled: (isSettled: boolean) => void;
-  sarchOpponent: TOpponentSelect;
-  setSearchOpponent: (opponent: TOpponentSelect) => void;
+  searchConditions: TSearchCondition;
+  setSearchConditions: (conditions: TSearchCondition) => void;
 };
 
 const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
   const {
     opponents,
-    searchType,
-    setSearchType,
-    searchIsSettled,
-    setSearchIsSettled,
-    sarchOpponent,
-    setSearchOpponent,
+    searchConditions,
+    setSearchConditions,
   } = props;
 
   return (
@@ -32,8 +24,11 @@ const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
           <select
             id="searchType"
             className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            value={searchType}
-            onChange={(e) => setSearchType(e.target.value as TTypeSelect)}
+            value={searchConditions.type || 'all'}
+            onChange={(e) => setSearchConditions({
+              ...searchConditions,
+              type: e.target.value as TTypeSelect,
+            })}
           >
             <option value="all">全て</option>
             <option value="1">貸し</option>
@@ -49,8 +44,11 @@ const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
           <select
             id="settlementStatus"
             className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            value={searchIsSettled ? '1' : '0'}
-            onChange={(e) => setSearchIsSettled(e.target.value === '1')}
+            value={searchConditions.isSettled ? '1' : '0'}
+            onChange={(e) => setSearchConditions({
+              ...searchConditions,
+              isSettled: e.target.value === '1',
+            })}
           >
             <option value="0">未清算</option>
             <option value="1">清算済み</option>
@@ -65,8 +63,11 @@ const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
           <select
             id="partnerType"
             className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            value={sarchOpponent}
-            onChange={(e) => setSearchOpponent(e.target.value as TOpponentSelect)}
+            value={searchConditions.opponent}
+            onChange={(e) => setSearchConditions({
+              ...searchConditions,
+              opponent: e.target.value as TOpponentSelect,
+            })}
           >
             <option value="all">全て</option>
             {

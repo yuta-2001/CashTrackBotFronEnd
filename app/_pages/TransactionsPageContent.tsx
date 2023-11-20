@@ -1,6 +1,7 @@
 'use client';
-import { useState } from 'react';
-import { TTransaction, TOpponent, TOpponentSelect, TTypeSelect, TCalculateResult, TUser } from '../_libs/types';
+import { useEffect, useState } from 'react';
+import { TTransaction, TOpponent, TOpponentSelect, TTypeSelect, TCalculateResult, TSearchCondition } from '../_libs/types';
+import { mockTransactions } from '../_libs/placeholder-data';
 import CreateModalComponent from '../_components/Transactions/Modal/CreateModalComponent';
 import EditModalComponent from '../_components/Transactions/Modal/EditModalComponent';
 import SettleConfirmModalComponent from '../_components/Transactions/Modal/SettleConfirmModalComponent';
@@ -9,23 +10,28 @@ import HeadBtnListComponent from '../_components/Transactions/HeadBtnList/HeadBt
 
 
 type Props = {
-  transactions: TTransaction[] | null;
   opponents: TOpponent[] | null;
 };
 
-
 export default function TransactionsPageContent(props: Props) {
-  const { transactions, opponents } = props;
+  const { opponents } = props;
 
-  const [searchType, setSearchType] = useState<TTypeSelect>('all');
-  const [searchIsSettled, setSearchIsSettled] = useState<boolean>(false);
-  const [sarchOpponent, setSearchOpponent] = useState<TOpponentSelect>('all');
+  const [searchConditions, setSearchConditions] = useState<TSearchCondition>({
+    type: 'all',
+    isSettled: false,
+    opponent: 'all',
+  })
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
   const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
+  const [transactions, setTransactions] = useState<TTransaction[] | null>(null);
+
+  useEffect(() => {
+    setTransactions(mockTransactions);
+  }, []);
 
   return (
     <div>
@@ -33,12 +39,8 @@ export default function TransactionsPageContent(props: Props) {
       <HeadBtnListComponent
         opponents={opponents}
         transactions={transactions}
-        searchType={searchType}
-        setSearchType={setSearchType}
-        setSearchIsSettled={setSearchIsSettled}
-        sarchOpponent={sarchOpponent}
-        setSearchOpponent={setSearchOpponent}
-        searchIsSettled={searchIsSettled}
+        searchConditions={searchConditions}
+        setSearchConditions={setSearchConditions}
         isSearchVisible={isSearchVisible}
         setIsSearchVisible={setIsSearchVisible}
         selectedTransactions={selectedTransactions}
@@ -50,9 +52,7 @@ export default function TransactionsPageContent(props: Props) {
       <ResultListComponent
         transactions={transactions}
         opponents={opponents}
-        searchType={searchType}
-        searchIsSettled={searchIsSettled}
-        sarchOpponent={sarchOpponent}
+        searchConditions={searchConditions}
         selectedTransactions={selectedTransactions}
         setSelectedTransactions={setSelectedTransactions}
         setTargetEditTransaction={setTargetEditTransaction}

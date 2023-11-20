@@ -12,8 +12,8 @@ type Props = {
   setSearchOpponent: (opponent: TOpponentSelect) => void;
   searchIsSettled: boolean;
   isSearchVisible: boolean;
+  setIsSearchVisible: (isVisible: boolean) => void;
   selectedTransactions: TTransaction[];
-  toggleSearchVisibility: () => void;
   setCalculateSettled: (calculate: TCalculateResult[]) => void;
   setIsOpenSettleConfirm: (isOpen: boolean) => void;
 }
@@ -30,8 +30,8 @@ export default function HeadBtnListComponent(props: Props) {
     setSearchOpponent,
     searchIsSettled,
     isSearchVisible,
+    setIsSearchVisible,
     selectedTransactions,
-    toggleSearchVisibility,
     setCalculateSettled,
     setIsOpenSettleConfirm,
   } = props;
@@ -143,7 +143,7 @@ export default function HeadBtnListComponent(props: Props) {
       </div>
       {/* 条件変更ボタン */}
       <button
-        onClick={toggleSearchVisibility}
+        onClick={() => setIsSearchVisible(!isSearchVisible)}
         className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
       >
         {isSearchVisible ? '閉じる' : '絞り込み'}

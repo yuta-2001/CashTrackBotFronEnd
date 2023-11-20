@@ -28,31 +28,6 @@ export default function TransactionsPageContent(props: Props) {
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
 
 
-  const results = transactions?.filter((transaction) => {
-    if (searchType !== 'all' && transaction.type !== Number(searchType)) {
-      return false;
-    }
-
-    if (transaction.is_settled !== searchIsSettled) {
-      return false;
-    }
-
-    if (sarchOpponent !== 'all' && transaction.opponent_id !== Number(sarchOpponent)) {
-      return false;
-    }
-
-    return true;
-  });
-
-  const toggleSearchVisibility = () => {
-    setIsSearchVisible(!isSearchVisible);
-  };
-
-  const handleSettleCancel = () => {
-    setIsOpenSettleConfirm(false);
-    setCalculateSettled([]);
-  }
-
   const handleSettle = () => {
     if (transactions === null) {
       return;
@@ -60,15 +35,6 @@ export default function TransactionsPageContent(props: Props) {
     // settleのAPIを叩く
     // 成功したら、selectedTransactionIdsを空にする。また、取引一覧を更新する。
     // 失敗したら、エラーを表示する。
-    const newTransactions = transactions.map((transaction) => {
-      if (selectedTransactions.includes(transaction)) {
-        return {
-          ...transaction,
-          is_settled: true,
-        };
-      }
-      return transaction;
-    });
   }
 
 
@@ -85,16 +51,19 @@ export default function TransactionsPageContent(props: Props) {
         setSearchOpponent={setSearchOpponent}
         searchIsSettled={searchIsSettled}
         isSearchVisible={isSearchVisible}
+        setIsSearchVisible={setIsSearchVisible}
         selectedTransactions={selectedTransactions}
-        toggleSearchVisibility={toggleSearchVisibility}
         setCalculateSettled={setCalculateSettled}
         setIsOpenSettleConfirm={setIsOpenSettleConfirm}
       />
 
       {/* 検索結果の一覧 */}
       <ResultListComponent
-        results={results}
+        transactions={transactions}
         opponents={opponents}
+        searchType={searchType}
+        searchIsSettled={searchIsSettled}
+        sarchOpponent={sarchOpponent}
         selectedTransactions={selectedTransactions}
         setSelectedTransactions={setSelectedTransactions}
         setTargetEditTransaction={setTargetEditTransaction}
@@ -102,7 +71,8 @@ export default function TransactionsPageContent(props: Props) {
 
       {isOpenSettleConfirm && (
         <SettleConfirmModalComponent
-          onClose={handleSettleCancel}
+          setIsOpenSettleConfirm={setIsOpenSettleConfirm}
+          setCalculateSettled={setCalculateSettled}
           onSubmit={handleSettle}
           calculateResults={calculateSettled}
         />

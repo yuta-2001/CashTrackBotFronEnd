@@ -1,9 +1,12 @@
-import { TTransaction, TOpponent } from "@/app/_libs/types";
+import { TTransaction, TOpponent, TTypeSelect, TOpponentSelect } from "@/app/_libs/types";
 import { TransactionType } from "@/app/_libs/enums";
 
 type Props = {
-  results: TTransaction[] | null | undefined;
+  transactions: TTransaction[] | null | undefined;
   opponents: TOpponent[] | null;
+  searchType: TTypeSelect;
+  searchIsSettled: boolean;
+  sarchOpponent: TOpponentSelect;
   selectedTransactions: TTransaction[];
   setSelectedTransactions: (transactions: TTransaction[]) => void;
   setTargetEditTransaction: (transaction: TTransaction) => void;
@@ -11,12 +14,32 @@ type Props = {
 
 export default function ResultListComponent(props: Props) {
   const {
-    results,
+    transactions,
     opponents,
+    searchType,
+    searchIsSettled,
+    sarchOpponent,
     selectedTransactions,
     setSelectedTransactions,
     setTargetEditTransaction
   } = props;
+
+
+  const results = transactions?.filter((transaction) => {
+    if (searchType !== 'all' && transaction.type !== Number(searchType)) {
+      return false;
+    }
+
+    if (transaction.is_settled !== searchIsSettled) {
+      return false;
+    }
+
+    if (sarchOpponent !== 'all' && transaction.opponent_id !== Number(sarchOpponent)) {
+      return false;
+    }
+
+    return true;
+  });
 
   const handleCheck = (transaction: TTransaction, isChecked: boolean) => {
     if (isChecked) {

@@ -37,32 +37,31 @@ export default function TransactionsPageContent(props: Props) {
   }, []);
 
   useEffect(() => {
-    const liffId = '2001720828-G90XMPmd';
+    const liffId = process.env.NEXT_PUBLIC_LIFF_ID!;
 
-    // if (typeof liffId === 'string') {
-      liff.init({
-        liffId: liffId,
+    liff.init({
+      liffId: liffId,
+    })
+      .then(() => {
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        }
       })
-        .then(() => {
-          if (!liff.isLoggedIn()) {
-            liff.login();
-          }
-        })
-        .then(() => {
-          liff.getProfile()
-            .then((profile) => {
-              setUser({
-                name: profile.displayName,
-                pictureUrl: profile.pictureUrl,
-              });
-            })
-            .catch((err) => {
-              alert(err);
+      .then(() => {
+        liff.getProfile()
+          .then((profile) => {
+            setUser({
+              name: profile.displayName,
+              pictureUrl: profile.pictureUrl,
             });
-        })
-        .catch((err) => {
-          alert(err);
-        });
+          })
+          .catch((err) => {
+            alert(err);
+          });
+      })
+      .catch((err) => {
+        alert(err);
+      });
   }, []);
 
   return (

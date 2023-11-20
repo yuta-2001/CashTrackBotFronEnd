@@ -2,6 +2,7 @@
 import { useForm } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
 import { mockOpponents } from "@/app/_libs/placeholder-data";
+import ValidationErrorText from "../../common/ValidationErrorText";
 
 type CreateModalProps = {
 	onClose: () => void;
@@ -33,7 +34,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 
 	return (
 		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-			<div className="bg-white w-11/12 max-w-6xl h-5/6 overflow-auto rounded shadow-lg p-6 relative">
+			<div style={{ maxHeight: '90%' }} className="bg-white w-11/12 max-w-6xl h-auto overflow-auto rounded shadow-lg p-6 relative">
 				<button
 					onClick={onClose}
 					className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
@@ -42,7 +43,6 @@ const CreateModalComponent = (props: CreateModalProps) => {
 				</button>
 				<h2 className="text-lg font-bold mb-4">作成</h2>
 				<form onSubmit={handleSubmit(onSubmit)}>
-
 					{/* Name field */}
 					<div className="mb-4">
 						<label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
@@ -55,9 +55,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 							placeholder="項目名"
 							{...register("name", { required: '項目名は必須です' })} 
 						/>
-						<span>
-							{errors.name && errors.name.message}
-						</span>
+						{errors.name && <ValidationErrorText message={errors.name.message} />}
 					</div>
 
 					{/* Opponent field */}
@@ -76,7 +74,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 								))
 							}
 						</select>
-						<span>{errors.opponent_id && errors.opponent_id.message}</span>
+						{errors.opponent_id && <ValidationErrorText message={errors.opponent_id.message} />}
 					</div>
 
 					{/* Is_settled field */}
@@ -92,7 +90,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 							<option value="0">未清算</option>
 							<option value="1">清算済み</option>
 						</select>
-						<span>{errors.is_settled && errors.is_settled.message}</span>
+						{errors.is_settled && <ValidationErrorText message={errors.is_settled.message} />}
 					</div>
 
 					{/* Type field */}
@@ -108,7 +106,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 							<option value={TransactionType.Lend}>貸し</option>
 							<option value={TransactionType.Borrow}>借り</option>
 						</select>
-						<span>{errors.amount && errors.amount.message}</span>
+						{errors.type && <ValidationErrorText message={errors.type.message} />}
 					</div>
 
 					{/* Amount field */}
@@ -123,7 +121,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 							placeholder="1000"
 							{...register("amount", { required: '金額の設定は必須です', valueAsNumber: true })} 
 						/>
-						<span>{errors.amount && errors.amount.message}</span>
+						{errors.amount && <ValidationErrorText message={errors.amount.message} />}
 					</div>
 
 					{/* Memo field */}

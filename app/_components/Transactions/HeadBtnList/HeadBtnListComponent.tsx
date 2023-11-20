@@ -1,16 +1,12 @@
-import { TTransaction, TOpponent, TTypeSelect, TOpponentSelect, TCalculateResult } from "@/app/_libs/types"
+import { TTransaction, TOpponent, TTypeSelect, TOpponentSelect, TCalculateResult, TSearchCondition } from "@/app/_libs/types"
 import { TransactionType, CalculateTransactionType } from "@/app/_libs/enums"
 import SearchBoxModalComponent from "@/app/_components/Transactions/Modal/SearchBoxModalComponent"
 
 type Props = {
   opponents: TOpponent[] | null;
   transactions: TTransaction[] | null;
-  searchType: TTypeSelect;
-  setSearchType: (type: TTypeSelect) => void;
-  setSearchIsSettled: (isSettled: boolean) => void;
-  sarchOpponent: TOpponentSelect;
-  setSearchOpponent: (opponent: TOpponentSelect) => void;
-  searchIsSettled: boolean;
+  searchConditions: TSearchCondition;
+  setSearchConditions: (condition: TSearchCondition) => void;
   isSearchVisible: boolean;
   setIsSearchVisible: (isVisible: boolean) => void;
   selectedTransactions: TTransaction[];
@@ -23,12 +19,8 @@ export default function HeadBtnListComponent(props: Props) {
   const {
     opponents,
     transactions,
-    searchType,
-    setSearchType,
-    setSearchIsSettled,
-    sarchOpponent,
-    setSearchOpponent,
-    searchIsSettled,
+    searchConditions,
+    setSearchConditions,
     isSearchVisible,
     setIsSearchVisible,
     selectedTransactions,
@@ -105,7 +97,7 @@ export default function HeadBtnListComponent(props: Props) {
   return (
     <div className="w-11/12 flex justify-between items-center mt-2 mx-auto relative">
       <div>
-        {!searchIsSettled && (
+        {!searchConditions.isSettled && (
           selectedTransactions.length > 0 ? (
             <button
               className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
@@ -152,12 +144,8 @@ export default function HeadBtnListComponent(props: Props) {
       {isSearchVisible && (
         <SearchBoxModalComponent
           opponents={opponents}
-          searchType={searchType}
-          setSearchType={setSearchType}
-          searchIsSettled={searchIsSettled}
-          setSearchIsSettled={setSearchIsSettled}
-          sarchOpponent={sarchOpponent}
-          setSearchOpponent={setSearchOpponent}
+          searchConditions={searchConditions}
+          setSearchConditions={setSearchConditions}
         />
       )}
     </div>

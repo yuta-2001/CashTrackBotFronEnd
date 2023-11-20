@@ -26,6 +26,11 @@ export type TCalculateResult = {
   'type': CalculateTransactionType,
 }
 
+export type TSearchCondition = {
+  'type': TTypeSelect,
+  'opponent': TOpponentSelect,
+  'isSettled': boolean,
+}
 
 export type TTypeSelect = 'all' | TransactionType.Lend | TransactionType.Borrow;
 

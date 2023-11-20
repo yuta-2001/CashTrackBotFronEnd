@@ -27,17 +27,6 @@ export default function TransactionsPageContent(props: Props) {
   const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
 
-
-  const handleSettle = () => {
-    if (transactions === null) {
-      return;
-    }
-    // settleのAPIを叩く
-    // 成功したら、selectedTransactionIdsを空にする。また、取引一覧を更新する。
-    // 失敗したら、エラーを表示する。
-  }
-
-
   return (
     <div>
       {/* 検索条件の表示 */}
@@ -73,7 +62,6 @@ export default function TransactionsPageContent(props: Props) {
         <SettleConfirmModalComponent
           setIsOpenSettleConfirm={setIsOpenSettleConfirm}
           setCalculateSettled={setCalculateSettled}
-          onSubmit={handleSettle}
           calculateResults={calculateSettled}
         />
       )}

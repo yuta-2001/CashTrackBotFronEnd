@@ -4,15 +4,19 @@ import { CalculateTransactionType } from '../../../_libs/enums';
 type SettleConfirmModalComponentProps = {
   setIsOpenSettleConfirm: (isOpen: boolean) => void;
   setCalculateSettled: (calculate: TCalculateResult[]) => void;
-  onSubmit: () => void;
   calculateResults: TCalculateResult[];
 }
 
 const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) => {
-  const { setIsOpenSettleConfirm, setCalculateSettled, onSubmit, calculateResults } = props;
+  const { setIsOpenSettleConfirm, setCalculateSettled, calculateResults } = props;
   const onClose = () => {
     setIsOpenSettleConfirm(false);
     setCalculateSettled([]);
+  }
+
+  const onSubmit = () => {
+    alert('清算しました');
+    onClose();
   }
 
   return (

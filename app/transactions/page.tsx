@@ -1,8 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useUser } from '../_contexts/UserProvider';
-import { useTransactions } from '../_contexts/TransactionsProvider';
-import { useOpponents } from '../_contexts/OpponentsProvider';
 import { TTransaction, TOpponentSelect, TTypeSelect, TCalculateResult } from '../_libs/types';
 import { TransactionType, CalculateTransactionType } from '../_libs/enums';
 import CreateModalComponent from '../_components/modal/transaction/CreateModalComponent';
@@ -10,6 +7,7 @@ import EditModalComponent from '../_components/modal/transaction/EditModalCompon
 import SettleConfirmModalComponent from '../_components/modal/transaction/SettleConfirmModalComponent';
 import HeaderComponent from '../_components/common/HeaderComponent';
 import SearchBoxModalComponent from '../_components/modal/transaction/SearchBoxModalComponent';
+import { mockOpponents, mockTransactions, mockUser } from '../_libs/placeholder-data';
 
 
 export default function Home() {
@@ -23,9 +21,9 @@ export default function Home() {
   const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
 
-  const user = useUser();
-  const transactions = useTransactions();
-  const opponents = useOpponents();
+  const user = mockUser;
+  const transactions = mockTransactions;
+  const opponents = mockOpponents;
 
   const handleCheck = (transaction: TTransaction, isChecked: boolean) => {
     if (isChecked) {

@@ -1,15 +1,15 @@
-import { user, transactions, opponents } from './placeholder-data';
+import { mockUser, mockTransactions, mockOpponents } from './placeholder-data';
 
 const getUser = () => {
-  return user;
+  return mockUser;
 }
 
 const getTransactions = () => {
-  return transactions;
+  return mockTransactions;
 }
 
 const getOpponents = () => {
-  return opponents;
+  return mockOpponents;
 }
 
 export { getUser, getTransactions, getOpponents };

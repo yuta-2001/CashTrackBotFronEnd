@@ -17,7 +17,7 @@ export type TTransaction = {
 
 export type TUser = {
   'name': string,
-  'profile_image': string,
+  'pictureUrl': string | undefined,
 }
 
 export type TCalculateResult = {

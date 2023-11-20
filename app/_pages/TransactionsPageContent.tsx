@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { TTransaction, TOpponent, TOpponentSelect, TTypeSelect, TCalculateResult, TSearchCondition } from '../_libs/types';
+import liff from '@line/liff';
+import { TTransaction, TOpponent, TCalculateResult, TSearchCondition, TUser } from '../_libs/types';
 import { mockTransactions } from '../_libs/placeholder-data';
 import CreateModalComponent from '../_components/Transactions/Modal/CreateModalComponent';
 import EditModalComponent from '../_components/Transactions/Modal/EditModalComponent';
 import SettleConfirmModalComponent from '../_components/Transactions/Modal/SettleConfirmModalComponent';
 import ResultListComponent from '../_components/Transactions/ResultList/ResultListComponent';
 import HeadBtnListComponent from '../_components/Transactions/HeadBtnList/HeadBtnListComponent';
+import HeaderComponent from '../_components/common/HeaderComponent';
 
 
 type Props = {
@@ -28,13 +30,45 @@ export default function TransactionsPageContent(props: Props) {
   const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
   const [transactions, setTransactions] = useState<TTransaction[] | null>(null);
+  const [user, setUser] = useState<TUser | null>(null);
 
   useEffect(() => {
     setTransactions(mockTransactions);
   }, []);
 
+  useEffect(() => {
+    const liffId = '2001720828-G90XMPmd';
+
+    // if (typeof liffId === 'string') {
+      liff.init({
+        liffId: liffId,
+      })
+        .then(() => {
+          if (!liff.isLoggedIn()) {
+            liff.login();
+          }
+        })
+        .then(() => {
+          liff.getProfile()
+            .then((profile) => {
+              setUser({
+                name: profile.displayName,
+                pictureUrl: profile.pictureUrl,
+              });
+            })
+            .catch((err) => {
+              alert(err);
+            });
+        })
+        .catch((err) => {
+          alert(err);
+        });
+  }, []);
+
   return (
     <div>
+      <HeaderComponent user={user} />
+
       {/* 検索条件の表示 */}
       <HeadBtnListComponent
         opponents={opponents}
@@ -68,7 +102,7 @@ export default function TransactionsPageContent(props: Props) {
 
       <button
         onClick={() => setIsCreateModalOpen(true)} 
-        className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600 text-white font-bold w-10 h-10 rounded-full leading-none text-3xl"
+        className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600 text-white font-bold w-16 h-16 rounded-full leading-none text-3xl"
         aria-label="Add"
       >
         +

@@ -34,6 +34,7 @@ export default function TransactionsPageContent() {
       if (!accessToken) return;
       const opponentsData = await getOpponents(accessToken);
       const transactionsData = await getTransactions(accessToken);
+      console.log(transactionsData)
       
       setOpponents(opponentsData);
       setTransactions(transactionsData);
@@ -109,6 +110,8 @@ export default function TransactionsPageContent() {
         <CreateModalComponent
           opponents={opponents}
           onClose={() => setIsCreateModalOpen(false)}
+          transactions={transactions}
+          setTransactions={setTransactions}
         />
       )}
 

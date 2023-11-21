@@ -45,8 +45,8 @@ export async function storeTransaction(transaction: any, accessToken: string) {
     throw new Error("API Error");
   }
 
-  const data = response.json();
-  return data;
+  const createdTransaction = await response.json();
+  return createdTransaction.data;
 }
 
 

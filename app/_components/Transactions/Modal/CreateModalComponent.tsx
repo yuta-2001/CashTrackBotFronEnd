@@ -2,17 +2,19 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
 import ValidationErrorText from "../../common/ValidationErrorText";
-import { TOpponent, TTransactionForm } from "@/app/_libs/types";
+import { TOpponent, TTransactionForm, TTransaction } from "@/app/_libs/types";
 import { storeTransaction } from "@/app/_libs/data";
 import liff from "@line/liff";
 
 type CreateModalProps = {
 	opponents: TOpponent[] | null;
 	onClose: () => void;
+	transactions: TTransaction[] | null;
+	setTransactions: (transactions: TTransaction[]) => void;
 };
 
 const CreateModalComponent = (props: CreateModalProps) => {
-	const { opponents, onClose } = props;
+	const { opponents, onClose, transactions, setTransactions } = props;
 
 	const {
     register,
@@ -25,11 +27,15 @@ const CreateModalComponent = (props: CreateModalProps) => {
 
 		if (accessToken) {
 				try {
-						await storeTransaction(data, accessToken);
+						const createdTransaction = await storeTransaction(data, accessToken);
+						setTransactions([...(transactions ?? []), createdTransaction]);
+						alert('作成しました');
 				} catch (e) {
 						alert('エラーが発生しました');
 				}
 		}
+
+		onClose();
 	}
 
 	return (

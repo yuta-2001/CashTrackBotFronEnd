@@ -1,21 +1,58 @@
-import { TCalculateResult } from '../../../_libs/types';
+import { TCalculateResult, TTransaction } from '../../../_libs/types';
 import { CalculateTransactionType } from '../../../_libs/enums';
+import { batchSettleTransaction } from '../../../_libs/data';
+import liff from '@line/liff';
 
 type SettleConfirmModalComponentProps = {
   setIsOpenSettleConfirm: (isOpen: boolean) => void;
   setCalculateSettled: (calculate: TCalculateResult[]) => void;
   calculateResults: TCalculateResult[];
+  selectedTransactions: TTransaction[];
+  setSelectedTransactions: (transactions: TTransaction[] | []) => void;
+  transactions: TTransaction[] | null;
+  setTransactions: (transactions: TTransaction[] | null) => void;
 }
 
 const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) => {
-  const { setIsOpenSettleConfirm, setCalculateSettled, calculateResults } = props;
+  const { 
+    setIsOpenSettleConfirm,
+    setCalculateSettled,
+    calculateResults,
+    selectedTransactions,
+    setSelectedTransactions,
+    transactions,
+    setTransactions,
+  } = props;
   const onClose = () => {
     setIsOpenSettleConfirm(false);
     setCalculateSettled([]);
   }
 
-  const onSubmit = () => {
-    alert('清算しました');
+  const onSubmit = async () => {
+    const transactionIds = selectedTransactions.map((settlement) => {
+      return settlement.id;
+    });
+
+    const accessToken = liff.getAccessToken();
+    if (!accessToken) return;
+
+    try {
+      await batchSettleTransaction(transactionIds, accessToken);
+    } catch (e) {
+      alert('エラーが発生しました');
+    }
+
+    setTransactions(transactions!.map((transaction) => {
+      if (transactionIds.includes(transaction.id)) {
+        return {
+          ...transaction,
+          isSettled: true,
+        }
+      }
+      return transaction;
+    }));
+
+    setSelectedTransactions([]);
     onClose();
   }
 

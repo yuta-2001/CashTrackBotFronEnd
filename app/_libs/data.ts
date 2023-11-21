@@ -78,10 +78,14 @@ export async function batchSettleTransaction(ids: Array<Number>, accessToken: st
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions/batch-settle?${query}`, {
     method: "PUT",
     body: JSON.stringify({ ids: ids }),
+    cache: "no-cache",
     headers: {
       "Content-Type": "application/json",
     },
+    mode: 'cors'
   });
+
+  console.log(response.status);
 
   if (response.status !== 200) {
     throw new Error("API Error");

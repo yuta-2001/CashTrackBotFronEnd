@@ -22,7 +22,7 @@ export default function TransactionsPageContent() {
   const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
-  const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
+  const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[] | []>([]);
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
   const [transactions, setTransactions] = useState<TTransaction[] | null>(null);
   const [user, setUser] = useState<TUser | null>(null);
@@ -100,6 +100,10 @@ export default function TransactionsPageContent() {
           setIsOpenSettleConfirm={setIsOpenSettleConfirm}
           setCalculateSettled={setCalculateSettled}
           calculateResults={calculateSettled}
+          selectedTransactions={selectedTransactions}
+          setSelectedTransactions={setSelectedTransactions}
+          transactions={transactions}
+          setTransactions={setTransactions}
         />
       )}
 
@@ -119,7 +123,7 @@ export default function TransactionsPageContent() {
           opponents={opponents}
           transaction={targetEditTransaction}
           onClose={() => setTargetEditTransaction(null)}
-          transactions={transactions}
+          transactions={selectedTransactions}
           setTransactions={setTransactions}
         />
       )}

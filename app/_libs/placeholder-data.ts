@@ -2,7 +2,7 @@ import { TUser, TTransaction, TOpponent } from '../_libs/types';
 
 const mockUser: TUser = {
   'name': 'Yuta',
-  'profile_image': 'aaa',
+  'pictureUrl': 'aaa',
 }
 
 

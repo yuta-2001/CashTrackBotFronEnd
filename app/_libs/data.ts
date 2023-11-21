@@ -1,4 +1,4 @@
-import { TTransaction } from "./types";
+import { TTransaction, TTransactionForm } from "./types";
 
 const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
 
@@ -50,23 +50,25 @@ export async function storeTransaction(transaction: any, accessToken: string) {
 }
 
 
-export async function updateTransaction(transaction: TTransaction, accessToken: string) {
+export async function updateTransaction(transactionId: number, transaction: TTransactionForm, accessToken: string): Promise<TTransaction> {
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
-  const response = await fetch(`${API_DOMAIN}/api/liff/transactions/${transaction.id}?${query}`, {
+  const response = await fetch(`${API_DOMAIN}/api/liff/transactions/${transactionId}?${query}`, {
     method: "PUT",
     body: JSON.stringify(transaction),
+    cache: "no-cache",
     headers: {
       "Content-Type": "application/json",
     },
+    mode: 'cors'
   });
 
   if (response.status !== 200) {
     throw new Error("API Error");
   }
 
-  const data = response.json();
-  return data;
+  const updatedTransaction = await response.json();
+  return updatedTransaction.data;
 }
 
 

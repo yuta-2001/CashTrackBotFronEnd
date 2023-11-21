@@ -8,7 +8,7 @@ const HeaderComponent = (props: HeaderComponentProps) => {
   const { user } = props
 
   return (
-    <header className="shadow p-4 py-3 flex items-center bg-green-500">
+    <header className="shadow p-4 py-3 flex items-center bg-green-500 w-full">
       <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
         <img src={user?.pictureUrl} />
       </div>

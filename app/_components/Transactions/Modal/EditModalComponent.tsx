@@ -1,13 +1,17 @@
 'use client';
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
-import { mockOpponents } from "@/app/_libs/placeholder-data";
 import ValidationErrorText from "../../common/ValidationErrorText";
-import { TTransaction } from "@/app/_libs/types";
+import { TTransaction, TTransactionForm, TOpponent } from "@/app/_libs/types";
+import { updateTransaction } from "@/app/_libs/data";
+import liff from "@line/liff";
 
 type EditModalProps = {
+	opponents: TOpponent[] | null;
   transaction: TTransaction;
 	onClose: () => void;
+	transactions: TTransaction[] | null;
+	setTransactions: (transactions: TTransaction[]) => void;
 };
 
 type FormData = {
@@ -20,7 +24,7 @@ type FormData = {
 };
 
 const EditModalComponent = (props: EditModalProps) => {
-	const { transaction, onClose } = props;
+	const { opponents, transaction, onClose, transactions, setTransactions } = props;
 
 	const {
     register,
@@ -28,11 +32,23 @@ const EditModalComponent = (props: EditModalProps) => {
     formState: { errors }
 	} = useForm<FormData>();
 
-	const onSubmit = (data: any) => {
-		console.log(data);
-	}
+	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
+		const accessToken = liff.getAccessToken();
 
-	const opponents = mockOpponents;
+		if (accessToken) {
+				try {
+						const updatedTransaction: TTransaction = await updateTransaction(transaction.id, data, accessToken);
+						if (updatedTransaction && transactions) {
+							setTransactions(transactions!.map((transaction) => {
+								return transaction.id === updatedTransaction.id ? updatedTransaction : transaction;
+							}));
+						};
+				} catch (e) {
+						alert('エラーが発生しました');
+				}
+		}
+		onClose();
+	}
 
 	return (
 		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
@@ -153,7 +169,7 @@ const EditModalComponent = (props: EditModalProps) => {
 
 					<div className="flex justify-center mt-4">
 						<button onClick={onClose} className="px-5 py-3 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
-						<button type="submit" className="px-5 py-3 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">作成する</button>
+						<button type="submit" className="px-5 py-3 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">更新する</button>
 					</div>
 				</form>
 			</div>

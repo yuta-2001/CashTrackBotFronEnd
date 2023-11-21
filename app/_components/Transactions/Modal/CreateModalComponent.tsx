@@ -28,8 +28,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 		if (accessToken) {
 				try {
 						const createdTransaction = await storeTransaction(data, accessToken);
-						setTransactions([...(transactions ?? []), createdTransaction]);
-						alert('作成しました');
+						setTransactions([createdTransaction, ...transactions!]);
 				} catch (e) {
 						alert('エラーが発生しました');
 				}

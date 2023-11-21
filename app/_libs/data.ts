@@ -85,8 +85,6 @@ export async function batchSettleTransaction(ids: Array<Number>, accessToken: st
     mode: 'cors'
   });
 
-  console.log(response.status);
-
   if (response.status !== 200) {
     throw new Error("API Error");
   }
@@ -121,6 +119,7 @@ export async function batchDeleteTransaction(ids: Array<Number>, accessToken: st
     headers: {
       "Content-Type": "application/json",
     },
+    mode: 'cors',
   });
 
   if (response.status !== 200) {

@@ -1,15 +1,19 @@
 import { TTransaction, TOpponent, TCalculateResult, TSearchCondition } from "@/app/_libs/types"
 import { TransactionType, CalculateTransactionType } from "@/app/_libs/enums"
 import SearchBoxModalComponent from "@/app/_components/Transactions/Modal/SearchBoxModalComponent"
+import liff from "@line/liff"
+import { batchDeleteTransaction } from "@/app/_libs/data"
 
 type Props = {
   opponents: TOpponent[] | null;
   transactions: TTransaction[] | null;
+  setTransactions: (transactions: TTransaction[]) => void;
   searchConditions: TSearchCondition;
   setSearchConditions: (condition: TSearchCondition) => void;
   isSearchVisible: boolean;
   setIsSearchVisible: (isVisible: boolean) => void;
   selectedTransactions: TTransaction[];
+  setSelectedTransactions: (transactions: TTransaction[] | []) => void;
   setCalculateSettled: (calculate: TCalculateResult[]) => void;
   setIsOpenSettleConfirm: (isOpen: boolean) => void;
 }
@@ -19,16 +23,19 @@ export default function HeadBtnListComponent(props: Props) {
   const {
     opponents,
     transactions,
+    setTransactions,
     searchConditions,
     setSearchConditions,
     isSearchVisible,
     setIsSearchVisible,
     selectedTransactions,
+    setSelectedTransactions,
     setCalculateSettled,
     setIsOpenSettleConfirm,
   } = props;
 
-  const handleDeleteConfirm = () => {
+
+  const handleDeleteConfirm = async () => {
     if (selectedTransactions.length === 0) {
       alert('削除する取引を選択してください');
       return;
@@ -37,6 +44,25 @@ export default function HeadBtnListComponent(props: Props) {
     if (!confirm('選択した取引を削除しますか？')) {
       return;
     }
+
+    const transactionIds = selectedTransactions.map((transaction) => {
+      return transaction.id;
+    });
+
+    const accessToken = liff.getAccessToken();
+    if (!accessToken) return;
+
+    try {
+      await batchDeleteTransaction(transactionIds, accessToken);
+    } catch (e) {
+      alert('エラーが発生しました');
+    }
+
+    setTransactions(transactions!.filter((transaction) => {
+      return !transactionIds.includes(transaction.id);
+    }));
+
+    setSelectedTransactions([]);
   };
 
   const handleSettleConfirm = () => {

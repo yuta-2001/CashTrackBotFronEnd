@@ -76,11 +76,13 @@ export default function TransactionsPageContent() {
       <HeadBtnListComponent
         opponents={opponents}
         transactions={transactions}
+        setTransactions={setTransactions}
         searchConditions={searchConditions}
         setSearchConditions={setSearchConditions}
         isSearchVisible={isSearchVisible}
         setIsSearchVisible={setIsSearchVisible}
         selectedTransactions={selectedTransactions}
+        setSelectedTransactions={setSelectedTransactions}
         setCalculateSettled={setCalculateSettled}
         setIsOpenSettleConfirm={setIsOpenSettleConfirm}
       />

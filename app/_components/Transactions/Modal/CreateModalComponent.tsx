@@ -26,12 +26,12 @@ const CreateModalComponent = (props: CreateModalProps) => {
 		const accessToken = liff.getAccessToken();
 
 		if (accessToken) {
-				try {
-						const createdTransaction = await storeTransaction(data, accessToken);
-						setTransactions([createdTransaction, ...transactions!]);
-				} catch (e) {
-						alert('エラーが発生しました');
-				}
+			try {
+					const createdTransaction = await storeTransaction(data, accessToken);
+					setTransactions([createdTransaction, ...transactions!]);
+			} catch (e) {
+					alert('エラーが発生しました');
+			}
 		}
 
 		onClose();

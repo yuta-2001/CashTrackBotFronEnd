@@ -22,7 +22,7 @@ export default function TransactionsPageContent() {
   const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
-  const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
+  const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[] | []>([]);
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
   const [transactions, setTransactions] = useState<TTransaction[] | null>(null);
   const [user, setUser] = useState<TUser | null>(null);
@@ -76,11 +76,13 @@ export default function TransactionsPageContent() {
       <HeadBtnListComponent
         opponents={opponents}
         transactions={transactions}
+        setTransactions={setTransactions}
         searchConditions={searchConditions}
         setSearchConditions={setSearchConditions}
         isSearchVisible={isSearchVisible}
         setIsSearchVisible={setIsSearchVisible}
         selectedTransactions={selectedTransactions}
+        setSelectedTransactions={setSelectedTransactions}
         setCalculateSettled={setCalculateSettled}
         setIsOpenSettleConfirm={setIsOpenSettleConfirm}
       />
@@ -100,6 +102,10 @@ export default function TransactionsPageContent() {
           setIsOpenSettleConfirm={setIsOpenSettleConfirm}
           setCalculateSettled={setCalculateSettled}
           calculateResults={calculateSettled}
+          selectedTransactions={selectedTransactions}
+          setSelectedTransactions={setSelectedTransactions}
+          transactions={transactions}
+          setTransactions={setTransactions}
         />
       )}
 

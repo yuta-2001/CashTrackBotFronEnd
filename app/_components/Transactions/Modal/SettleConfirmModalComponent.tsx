@@ -46,7 +46,7 @@ const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) =>
       if (transactionIds.includes(transaction.id)) {
         return {
           ...transaction,
-          isSettled: true,
+          is_settled: true,
         }
       }
       return transaction;

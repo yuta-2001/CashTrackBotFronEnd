@@ -125,7 +125,7 @@ export default function TransactionsPageContent() {
           opponents={opponents}
           transaction={targetEditTransaction}
           onClose={() => setTargetEditTransaction(null)}
-          transactions={selectedTransactions}
+          transactions={transactions}
           setTransactions={setTransactions}
         />
       )}

@@ -9,6 +9,7 @@ import SettleConfirmModalComponent from '../_components/Transactions/Modal/Settl
 import ResultListComponent from '../_components/Transactions/ResultList/ResultListComponent';
 import HeadBtnListComponent from '../_components/Transactions/HeadBtnList/HeadBtnListComponent';
 import HeaderComponent from '../_components/common/HeaderComponent';
+import CreateBtnComponent from '../_components/Transactions/Button/CreateBtnComponent';
 
 
 type Props = {
@@ -99,13 +100,7 @@ export default function TransactionsPageContent(props: Props) {
         />
       )}
 
-      <button
-        onClick={() => setIsCreateModalOpen(true)} 
-        className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600 text-white font-bold w-16 h-16 rounded-full leading-none text-3xl"
-        aria-label="Add"
-      >
-        +
-      </button>
+      <CreateBtnComponent setIsCreateModalOpen={setIsCreateModalOpen} />
 
       {isCreateModalOpen && (
         <CreateModalComponent

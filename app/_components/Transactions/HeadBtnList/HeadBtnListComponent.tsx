@@ -1,4 +1,4 @@
-import { TTransaction, TOpponent, TTypeSelect, TOpponentSelect, TCalculateResult, TSearchCondition } from "@/app/_libs/types"
+import { TTransaction, TOpponent, TCalculateResult, TSearchCondition } from "@/app/_libs/types"
 import { TransactionType, CalculateTransactionType } from "@/app/_libs/enums"
 import SearchBoxModalComponent from "@/app/_components/Transactions/Modal/SearchBoxModalComponent"
 

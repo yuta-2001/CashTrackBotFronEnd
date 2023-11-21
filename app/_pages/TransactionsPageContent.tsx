@@ -4,9 +4,9 @@ import liff from '@line/liff';
 import { TTransaction, TOpponent, TSearchCondition, TUser } from '../_libs/types';
 import ResultListComponent from '../_components/Transactions/ResultList/ResultListComponent';
 import HeadBtnListComponent from '../_components/Transactions/HeadBtnList/HeadBtnListComponent';
+import CreateTransactionComponent from '../_components/Transactions/CreateTransaction/CreateTransactionComponent';
 import HeaderComponent from '../_components/common/HeaderComponent';
 import { getOpponents, getTransactions } from '../_libs/data';
-import CreateTransactionComponent from '../_components/Transactions/CreateTransaction/CreateTransactionComponent';
 
 
 export default function TransactionsPageContent() {
@@ -15,7 +15,6 @@ export default function TransactionsPageContent() {
     isSettled: false,
     opponent: 'all',
   })
-
   const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[] | []>([]);
   const [transactions, setTransactions] = useState<TTransaction[] | []>([]);
   const [user, setUser] = useState<TUser | null>(null);

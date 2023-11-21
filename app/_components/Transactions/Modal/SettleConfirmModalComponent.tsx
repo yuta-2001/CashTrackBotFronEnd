@@ -57,7 +57,7 @@ const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) =>
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-20">
       <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg p-6 relative">
         <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
         <h2 className="text-lg font-bold mb-4">清算額を確認</h2>

@@ -34,6 +34,7 @@ const EditModalComponent = (props: EditModalProps) => {
 
 	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
 		const accessToken = liff.getAccessToken();
+		console.log(data);
 
 		if (accessToken) {
 				try {

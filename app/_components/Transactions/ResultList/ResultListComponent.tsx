@@ -1,3 +1,5 @@
+'use client'
+import React, { useEffect, useState } from "react";
 import { TTransaction, TOpponent, TSearchCondition } from "@/app/_libs/types";
 import { TransactionType } from "@/app/_libs/enums";
 
@@ -20,22 +22,27 @@ export default function ResultListComponent(props: Props) {
     setTargetEditTransaction
   } = props;
 
+  const [results, setResults] = useState<TTransaction[] | null | undefined>(transactions);
 
-  const results = transactions?.filter((transaction) => {
-    if (searchConditions.type !== 'all' && transaction.type !== Number(searchConditions.type)) {
-      return false;
+  useEffect(() => {
+    if (transactions) {
+      setResults(transactions.filter((transaction) => {
+        if (searchConditions.type !== 'all' && transaction.type !== Number(searchConditions.type)) {
+          return false;
+        }
+
+        if (transaction.is_settled !== searchConditions.isSettled) {
+          return false;
+        }
+
+        if (searchConditions.opponent !== 'all' && transaction.opponent_id !== Number(searchConditions.opponent)) {
+          return false;
+        }
+
+        return true;
+      }));
     }
-
-    if (transaction.is_settled !== searchConditions.isSettled) {
-      return false;
-    }
-
-    if (searchConditions.opponent !== 'all' && transaction.opponent_id !== Number(searchConditions.opponent)) {
-      return false;
-    }
-
-    return true;
-  });
+  }, [searchConditions, transactions]);
 
   const handleCheck = (transaction: TTransaction, isChecked: boolean) => {
     if (isChecked) {

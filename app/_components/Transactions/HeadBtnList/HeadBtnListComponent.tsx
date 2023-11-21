@@ -1,4 +1,4 @@
-import { TTransaction, TOpponent, TTypeSelect, TOpponentSelect, TCalculateResult, TSearchCondition } from "@/app/_libs/types"
+import { TTransaction, TOpponent, TCalculateResult, TSearchCondition } from "@/app/_libs/types"
 import { TransactionType, CalculateTransactionType } from "@/app/_libs/enums"
 import SearchBoxModalComponent from "@/app/_components/Transactions/Modal/SearchBoxModalComponent"
 
@@ -95,22 +95,22 @@ export default function HeadBtnListComponent(props: Props) {
   }
 
   return (
-    <div className="w-11/12 flex justify-between items-center mt-2 mx-auto relative">
+    <div className="w-11/12 flex justify-between items-center mt-4 mx-auto relative">
       <div>
         {!searchConditions.isSettled && (
           selectedTransactions.length > 0 ? (
             <button
-              className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
+              className="px-4 py-3 mr-2 bg-green-500 text-white text-md font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
               onClick={handleSettleConfirm}
             >
-              清算額を計算
+              一括清算
             </button>
           ) : (
             <button
-              className="px-3 py-1 mr-2 bg-gray-300 text-white text-xs font-semibold rounded-lg shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
+              className="px-4 py-3 mr-2 bg-gray-300 text-white text-md font-semibold rounded-lg shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
               disabled
             >
-              清算額を計算
+              一括清算
             </button>
           )
         )}
@@ -118,17 +118,17 @@ export default function HeadBtnListComponent(props: Props) {
         {
           selectedTransactions.length > 0 ? (
             <button
-              className="px-3 py-1 mr-2 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
+              className="px-4 py-3 mr-2 bg-green-500 text-white text-md font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
               onClick={handleDeleteConfirm}
             >
-              選択した取引を削除
+              一括削除
             </button>
           ) : (
             <button
-              className="px-3 py-1 mr-2 bg-gray-300 text-white text-xs font-semibold rounded-lg shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
+              className="px-4 py-3 mr-2 bg-gray-300 text-white text-md font-semibold rounded-lg shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
               disabled
             >
-              選択した取引を削除
+              一括削除
             </button>
           )
         }
@@ -136,7 +136,7 @@ export default function HeadBtnListComponent(props: Props) {
       {/* 条件変更ボタン */}
       <button
         onClick={() => setIsSearchVisible(!isSearchVisible)}
-        className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
+        className="px-4 py-3 bg-green-500 text-white text-md font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
       >
         {isSearchVisible ? '閉じる' : '絞り込み'}
       </button>

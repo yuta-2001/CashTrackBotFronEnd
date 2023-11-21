@@ -1,36 +1,41 @@
 'use client';
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
-import { mockOpponents } from "@/app/_libs/placeholder-data";
 import ValidationErrorText from "../../common/ValidationErrorText";
+import { TOpponent, TTransactionForm, TTransaction } from "@/app/_libs/types";
+import { storeTransaction } from "@/app/_libs/data";
+import liff from "@line/liff";
 
 type CreateModalProps = {
+	opponents: TOpponent[] | null;
 	onClose: () => void;
-};
-
-type FormData = {
-	name: string;
-	opponent_id: number;
-	is_settled: boolean;
-	type: TransactionType;
-	amount: number;
-	memo: string;
+	transactions: TTransaction[] | null;
+	setTransactions: (transactions: TTransaction[]) => void;
 };
 
 const CreateModalComponent = (props: CreateModalProps) => {
-	const { onClose } = props;
+	const { opponents, onClose, transactions, setTransactions } = props;
 
 	const {
     register,
     handleSubmit,
     formState: { errors }
-	} = useForm<FormData>();
+	} = useForm<TTransactionForm>();
 
-	const onSubmit = (data: any) => {
-		console.log(data);
+	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
+		const accessToken = liff.getAccessToken();
+
+		if (accessToken) {
+				try {
+						const createdTransaction = await storeTransaction(data, accessToken);
+						setTransactions([createdTransaction, ...transactions!]);
+				} catch (e) {
+						alert('エラーが発生しました');
+				}
+		}
+
+		onClose();
 	}
-
-	const opponents = mockOpponents;
 
 	return (
 		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
@@ -51,7 +56,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 						<input
 							id="name"
 							type="text"
-							className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+							className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							placeholder="項目名"
 							{...register("name", { required: '項目名は必須です' })} 
 						/>
@@ -65,7 +70,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 						</label>
 						<select
 							id="opponent"
-							className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+							className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							{...register("opponent_id", { required: '相手の選択は必須です' })}
 						>
 							{
@@ -84,7 +89,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 						</label>
 						<select
 							id="is_settled"
-							className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+							className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							{...register("is_settled", { required: '清算ステータスの選択は必須です' })} 
 						>
 							<option value="0">未清算</option>
@@ -100,7 +105,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 						</label>
 						<select
 							id="type"
-							className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+							className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							{...register("type", { required: 'タイプの選択は必須です' })} 
 						>
 							<option value={TransactionType.Lend}>貸し</option>
@@ -117,7 +122,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 						<input
 							id="amount"
 							type="number"
-							className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+							className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							placeholder="1000"
 							{...register("amount", { required: '金額の設定は必須です', valueAsNumber: true })} 
 						/>
@@ -132,15 +137,15 @@ const CreateModalComponent = (props: CreateModalProps) => {
 						<input
 							id="memo"
 							type="text"
-							className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+							className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							placeholder="メモ"
 							{...register("memo")} 
 						/>
 					</div>
 
 					<div className="flex justify-center mt-4">
-						<button onClick={onClose} className="px-4 py-2 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
-						<button type="submit" className="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">作成する</button>
+						<button onClick={onClose} className="px-5 py-3 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
+						<button type="submit" className="px-5 py-3 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">作成する</button>
 					</div>
 				</form>
 			</div>

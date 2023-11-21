@@ -14,16 +14,16 @@ const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
   } = props;
 
   return (
-    <div className="bg-white p-4 shadow-md w-2/3 absolute top-8 right-0 rounded-md">
+    <div className="bg-white p-4 shadow-md w-2/3 absolute top-14 right-0 rounded-md">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {/* 取引タイプ選択 */}
         <div>
           <label htmlFor="searchType" className="text-sm font-bold text-gray-700">
-            取引タイプ
+            取引タイプ (貸し/借り)
           </label>
           <select
             id="searchType"
-            className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             value={searchConditions.type || 'all'}
             onChange={(e) => setSearchConditions({
               ...searchConditions,
@@ -43,7 +43,7 @@ const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
           </label>
           <select
             id="settlementStatus"
-            className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             value={searchConditions.isSettled ? '1' : '0'}
             onChange={(e) => setSearchConditions({
               ...searchConditions,
@@ -58,11 +58,11 @@ const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
         {/* 相手タイプ選択 */}
         <div>
           <label htmlFor="partnerType" className="text-sm font-bold text-gray-700">
-            相手タイプ
+            相手
           </label>
           <select
             id="partnerType"
-            className="mt-1 block w-full p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             value={searchConditions.opponent}
             onChange={(e) => setSearchConditions({
               ...searchConditions,

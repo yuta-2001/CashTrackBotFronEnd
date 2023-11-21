@@ -1,21 +1,18 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { TTransaction, TOpponent, TOpponentSelect, TTypeSelect, TCalculateResult, TSearchCondition } from '../_libs/types';
-import { mockTransactions } from '../_libs/placeholder-data';
+import liff from '@line/liff';
+import { TTransaction, TOpponent, TCalculateResult, TSearchCondition, TUser } from '../_libs/types';
 import CreateModalComponent from '../_components/Transactions/Modal/CreateModalComponent';
 import EditModalComponent from '../_components/Transactions/Modal/EditModalComponent';
 import SettleConfirmModalComponent from '../_components/Transactions/Modal/SettleConfirmModalComponent';
 import ResultListComponent from '../_components/Transactions/ResultList/ResultListComponent';
 import HeadBtnListComponent from '../_components/Transactions/HeadBtnList/HeadBtnListComponent';
+import HeaderComponent from '../_components/common/HeaderComponent';
+import CreateBtnComponent from '../_components/Transactions/Button/CreateBtnComponent';
+import { getOpponents, getTransactions } from '../_libs/data';
 
 
-type Props = {
-  opponents: TOpponent[] | null;
-};
-
-export default function TransactionsPageContent(props: Props) {
-  const { opponents } = props;
-
+export default function TransactionsPageContent() {
   const [searchConditions, setSearchConditions] = useState<TSearchCondition>({
     type: 'all',
     isSettled: false,
@@ -28,13 +25,53 @@ export default function TransactionsPageContent(props: Props) {
   const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
   const [transactions, setTransactions] = useState<TTransaction[] | null>(null);
+  const [user, setUser] = useState<TUser | null>(null);
+  const [opponents, setOpponents] = useState<TOpponent[] | null>(null);
 
   useEffect(() => {
-    setTransactions(mockTransactions);
+    const fetchData = async () => {
+      const accessToken = liff.getAccessToken();
+      if (!accessToken) return;
+      const opponentsData = await getOpponents(accessToken);
+      const transactionsData = await getTransactions(accessToken);
+      
+      setOpponents(opponentsData);
+      setTransactions(transactionsData);
+    }
+
+    const liffId = process.env.NEXT_PUBLIC_LIFF_ID!;
+    liff.init({
+      liffId: liffId,
+    })
+      .then(() => {
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        }
+      })
+      .then(() => {
+        liff.getProfile()
+          .then((profile) => {
+            setUser({
+              name: profile.displayName,
+              pictureUrl: profile.pictureUrl,
+            });
+          })
+          .catch((err) => {
+            alert(err);
+          });
+      })
+      .then(() => {
+        fetchData();
+      })
+      .catch((err) => {
+        alert(err);
+      });
   }, []);
 
   return (
     <div>
+      <HeaderComponent user={user} />
+
       {/* 検索条件の表示 */}
       <HeadBtnListComponent
         opponents={opponents}
@@ -66,24 +103,24 @@ export default function TransactionsPageContent(props: Props) {
         />
       )}
 
-      <button
-        onClick={() => setIsCreateModalOpen(true)} 
-        className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600 text-white font-bold w-10 h-10 rounded-full leading-none text-3xl"
-        aria-label="Add"
-      >
-        +
-      </button>
+      <CreateBtnComponent setIsCreateModalOpen={setIsCreateModalOpen} />
 
       {isCreateModalOpen && (
         <CreateModalComponent
+          opponents={opponents}
           onClose={() => setIsCreateModalOpen(false)}
+          transactions={transactions}
+          setTransactions={setTransactions}
         />
       )}
 
       {targetEditTransaction && (
         <EditModalComponent
+          opponents={opponents}
           transaction={targetEditTransaction}
           onClose={() => setTargetEditTransaction(null)}
+          transactions={transactions}
+          setTransactions={setTransactions}
         />
       )}
     </div>

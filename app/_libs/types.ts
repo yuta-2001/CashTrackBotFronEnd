@@ -17,7 +17,7 @@ export type TTransaction = {
 
 export type TUser = {
   'name': string,
-  'profile_image': string,
+  'pictureUrl': string | undefined,
 }
 
 export type TCalculateResult = {
@@ -35,3 +35,12 @@ export type TSearchCondition = {
 export type TTypeSelect = 'all' | TransactionType.Lend | TransactionType.Borrow;
 
 export type TOpponentSelect = 'all' | number;
+
+export type TTransactionForm = {
+  'opponent_id': number,
+  'type': TransactionType,
+  'is_settled': boolean,
+  'name': string,
+  'amount': number,
+  'memo': string | null,
+}

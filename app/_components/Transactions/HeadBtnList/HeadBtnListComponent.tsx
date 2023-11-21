@@ -1,21 +1,19 @@
+import React, { useState } from "react"
 import { TTransaction, TOpponent, TCalculateResult, TSearchCondition } from "@/app/_libs/types"
 import { TransactionType, CalculateTransactionType } from "@/app/_libs/enums"
 import SearchBoxModalComponent from "@/app/_components/Transactions/Modal/SearchBoxModalComponent"
+import SettleConfirmModalComponent from "@/app/_components/Transactions/Modal/SettleConfirmModalComponent"
 import liff from "@line/liff"
 import { batchDeleteTransaction } from "@/app/_libs/data"
 
 type Props = {
   opponents: TOpponent[] | null;
   transactions: TTransaction[] | null;
-  setTransactions: (transactions: TTransaction[]) => void;
+  setTransactions: (transactions: TTransaction[] | []) => void;
   searchConditions: TSearchCondition;
   setSearchConditions: (condition: TSearchCondition) => void;
-  isSearchVisible: boolean;
-  setIsSearchVisible: (isVisible: boolean) => void;
   selectedTransactions: TTransaction[];
   setSelectedTransactions: (transactions: TTransaction[] | []) => void;
-  setCalculateSettled: (calculate: TCalculateResult[]) => void;
-  setIsOpenSettleConfirm: (isOpen: boolean) => void;
 }
 
 export default function HeadBtnListComponent(props: Props) {
@@ -26,14 +24,13 @@ export default function HeadBtnListComponent(props: Props) {
     setTransactions,
     searchConditions,
     setSearchConditions,
-    isSearchVisible,
-    setIsSearchVisible,
     selectedTransactions,
     setSelectedTransactions,
-    setCalculateSettled,
-    setIsOpenSettleConfirm,
   } = props;
 
+  const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
+  const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
+  const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
 
   const handleDeleteConfirm = async () => {
     if (selectedTransactions.length === 0) {
@@ -172,6 +169,18 @@ export default function HeadBtnListComponent(props: Props) {
           opponents={opponents}
           searchConditions={searchConditions}
           setSearchConditions={setSearchConditions}
+        />
+      )}
+
+      {isOpenSettleConfirm && (
+        <SettleConfirmModalComponent
+          setIsOpenSettleConfirm={setIsOpenSettleConfirm}
+          setCalculateSettled={setCalculateSettled}
+          calculateResults={calculateSettled}
+          selectedTransactions={selectedTransactions}
+          setSelectedTransactions={setSelectedTransactions}
+          transactions={transactions}
+          setTransactions={setTransactions}
         />
       )}
     </div>

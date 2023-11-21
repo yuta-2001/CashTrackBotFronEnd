@@ -1,15 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import liff from '@line/liff';
-import { TTransaction, TOpponent, TCalculateResult, TSearchCondition, TUser } from '../_libs/types';
-import CreateModalComponent from '../_components/Transactions/Modal/CreateModalComponent';
-import EditModalComponent from '../_components/Transactions/Modal/EditModalComponent';
-import SettleConfirmModalComponent from '../_components/Transactions/Modal/SettleConfirmModalComponent';
+import { TTransaction, TOpponent, TSearchCondition, TUser } from '../_libs/types';
 import ResultListComponent from '../_components/Transactions/ResultList/ResultListComponent';
 import HeadBtnListComponent from '../_components/Transactions/HeadBtnList/HeadBtnListComponent';
 import HeaderComponent from '../_components/common/HeaderComponent';
-import CreateBtnComponent from '../_components/Transactions/Button/CreateBtnComponent';
 import { getOpponents, getTransactions } from '../_libs/data';
+import CreateTransactionComponent from '../_components/Transactions/CreateTransaction/CreateTransactionComponent';
 
 
 export default function TransactionsPageContent() {
@@ -18,13 +15,9 @@ export default function TransactionsPageContent() {
     isSettled: false,
     opponent: 'all',
   })
-  const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
-  const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-  const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
+
   const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[] | []>([]);
-  const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
-  const [transactions, setTransactions] = useState<TTransaction[] | null>(null);
+  const [transactions, setTransactions] = useState<TTransaction[] | []>([]);
   const [user, setUser] = useState<TUser | null>(null);
   const [opponents, setOpponents] = useState<TOpponent[] | null>(null);
 
@@ -44,11 +37,11 @@ export default function TransactionsPageContent() {
       liffId: liffId,
     })
       .then(() => {
+        // ブラウザでテストする時のみ
         if (!liff.isLoggedIn()) {
           liff.login();
         }
-      })
-      .then(() => {
+
         liff.getProfile()
           .then((profile) => {
             setUser({
@@ -66,69 +59,37 @@ export default function TransactionsPageContent() {
       .catch((err) => {
         alert(err);
       });
+
   }, []);
 
   return (
     <div>
       <HeaderComponent user={user} />
 
-      {/* 検索条件の表示 */}
       <HeadBtnListComponent
         opponents={opponents}
         transactions={transactions}
         setTransactions={setTransactions}
         searchConditions={searchConditions}
         setSearchConditions={setSearchConditions}
-        isSearchVisible={isSearchVisible}
-        setIsSearchVisible={setIsSearchVisible}
         selectedTransactions={selectedTransactions}
         setSelectedTransactions={setSelectedTransactions}
-        setCalculateSettled={setCalculateSettled}
-        setIsOpenSettleConfirm={setIsOpenSettleConfirm}
       />
 
-      {/* 検索結果の一覧 */}
       <ResultListComponent
         transactions={transactions}
+        setTransactions={setTransactions}
         opponents={opponents}
         searchConditions={searchConditions}
         selectedTransactions={selectedTransactions}
         setSelectedTransactions={setSelectedTransactions}
-        setTargetEditTransaction={setTargetEditTransaction}
       />
 
-      {isOpenSettleConfirm && (
-        <SettleConfirmModalComponent
-          setIsOpenSettleConfirm={setIsOpenSettleConfirm}
-          setCalculateSettled={setCalculateSettled}
-          calculateResults={calculateSettled}
-          selectedTransactions={selectedTransactions}
-          setSelectedTransactions={setSelectedTransactions}
-          transactions={transactions}
-          setTransactions={setTransactions}
-        />
-      )}
-
-      <CreateBtnComponent setIsCreateModalOpen={setIsCreateModalOpen} />
-
-      {isCreateModalOpen && (
-        <CreateModalComponent
-          opponents={opponents}
-          onClose={() => setIsCreateModalOpen(false)}
-          transactions={transactions}
-          setTransactions={setTransactions}
-        />
-      )}
-
-      {targetEditTransaction && (
-        <EditModalComponent
-          opponents={opponents}
-          transaction={targetEditTransaction}
-          onClose={() => setTargetEditTransaction(null)}
-          transactions={transactions}
-          setTransactions={setTransactions}
-        />
-      )}
+      <CreateTransactionComponent
+        opponents={opponents}
+        transactions={transactions}
+        setTransactions={setTransactions}
+      />
     </div>
   );
 }

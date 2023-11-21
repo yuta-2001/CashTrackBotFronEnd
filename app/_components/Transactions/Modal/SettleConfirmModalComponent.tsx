@@ -10,7 +10,7 @@ type SettleConfirmModalComponentProps = {
   selectedTransactions: TTransaction[];
   setSelectedTransactions: (transactions: TTransaction[] | []) => void;
   transactions: TTransaction[] | null;
-  setTransactions: (transactions: TTransaction[] | null) => void;
+  setTransactions: (transactions: TTransaction[] | []) => void;
 }
 
 const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) => {

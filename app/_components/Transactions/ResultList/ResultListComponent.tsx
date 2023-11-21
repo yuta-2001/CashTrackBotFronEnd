@@ -2,26 +2,28 @@
 import React, { useEffect, useState } from "react";
 import { TTransaction, TOpponent, TSearchCondition } from "@/app/_libs/types";
 import { TransactionType } from "@/app/_libs/enums";
+import EditModalComponent from "@/app/_components/Transactions/Modal/EditModalComponent";
 
 type Props = {
-  transactions: TTransaction[] | null | undefined;
+  transactions: TTransaction[] | null;
+  setTransactions: (transactions: TTransaction[] | []) => void;
   opponents: TOpponent[] | null;
   searchConditions: TSearchCondition;
   selectedTransactions: TTransaction[];
   setSelectedTransactions: (transactions: TTransaction[]) => void;
-  setTargetEditTransaction: (transaction: TTransaction) => void;
 };
 
 export default function ResultListComponent(props: Props) {
   const {
     transactions,
+    setTransactions,
     opponents,
     searchConditions,
     selectedTransactions,
     setSelectedTransactions,
-    setTargetEditTransaction
   } = props;
 
+  const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
   const [results, setResults] = useState<TTransaction[] | null | undefined>(transactions);
 
   useEffect(() => {
@@ -78,6 +80,16 @@ export default function ResultListComponent(props: Props) {
           </div>
         </div>
       ))}
-      </div>
+
+      {targetEditTransaction && (
+        <EditModalComponent
+          opponents={opponents}
+          transaction={targetEditTransaction}
+          onClose={() => setTargetEditTransaction(null)}
+          transactions={transactions}
+          setTransactions={setTransactions}
+        />
+      )}
+    </div>
   )
 }

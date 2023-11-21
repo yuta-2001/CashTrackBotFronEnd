@@ -1,4 +1,4 @@
-import { TTransaction, TOpponent, TTypeSelect, TOpponentSelect, TSearchCondition } from "@/app/_libs/types";
+import { TTransaction, TOpponent, TSearchCondition } from "@/app/_libs/types";
 import { TransactionType } from "@/app/_libs/enums";
 
 type Props = {

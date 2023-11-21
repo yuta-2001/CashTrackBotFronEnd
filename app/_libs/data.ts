@@ -11,8 +11,8 @@ export async function getOpponents(accessToken: string) {
     throw new Error("API Error");
   }
 
-  const opponentsData = response.json();
-  return opponentsData;
+  const opponents = await response.json();
+  return opponents.data;
 }
 
 
@@ -25,12 +25,12 @@ export async function getTransactions(accessToken: string) {
     throw new Error("API Error");
   }
 
-  const transactionsData = response.json();
-  return transactionsData;
+  const transactions = await response.json();
+  return transactions.data;
 }
 
 
-export async function storeTransaction(transaction: TTransaction, accessToken: string) {
+export async function storeTransaction(transaction: any, accessToken: string) {
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions?${query}`, {
@@ -74,8 +74,8 @@ export async function batchSettleTransaction(ids: Array<Number>, accessToken: st
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions/batch-settle?${query}`, {
-    method: "POST",
-    body: JSON.stringify({ ids }),
+    method: "PUT",
+    body: JSON.stringify({ ids: ids }),
     headers: {
       "Content-Type": "application/json",
     },
@@ -111,7 +111,7 @@ export async function batchDeleteTransaction(ids: Array<Number>, accessToken: st
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions/batch-delete?${query}`, {
     method: "POST",
-    body: JSON.stringify({ ids }),
+    body: JSON.stringify({ ids: ids }),
     headers: {
       "Content-Type": "application/json",
     },

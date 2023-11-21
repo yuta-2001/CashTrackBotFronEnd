@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import liff from '@line/liff';
 import { TTransaction, TOpponent, TCalculateResult, TSearchCondition, TUser } from '../_libs/types';
-import { mockTransactions } from '../_libs/placeholder-data';
 import CreateModalComponent from '../_components/Transactions/Modal/CreateModalComponent';
 import EditModalComponent from '../_components/Transactions/Modal/EditModalComponent';
 import SettleConfirmModalComponent from '../_components/Transactions/Modal/SettleConfirmModalComponent';
@@ -10,15 +9,10 @@ import ResultListComponent from '../_components/Transactions/ResultList/ResultLi
 import HeadBtnListComponent from '../_components/Transactions/HeadBtnList/HeadBtnListComponent';
 import HeaderComponent from '../_components/common/HeaderComponent';
 import CreateBtnComponent from '../_components/Transactions/Button/CreateBtnComponent';
+import { getOpponents, getTransactions } from '../_libs/data';
 
 
-type Props = {
-  opponents: TOpponent[] | null;
-};
-
-export default function TransactionsPageContent(props: Props) {
-  const { opponents } = props;
-
+export default function TransactionsPageContent() {
   const [searchConditions, setSearchConditions] = useState<TSearchCondition>({
     type: 'all',
     isSettled: false,
@@ -32,14 +26,20 @@ export default function TransactionsPageContent(props: Props) {
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
   const [transactions, setTransactions] = useState<TTransaction[] | null>(null);
   const [user, setUser] = useState<TUser | null>(null);
+  const [opponents, setOpponents] = useState<TOpponent[] | null>(null);
 
   useEffect(() => {
-    setTransactions(mockTransactions);
-  }, []);
+    const fetchData = async () => {
+      const accessToken = liff.getAccessToken();
+      if (!accessToken) return;
+      const opponentsData = await getOpponents(accessToken);
+      const transactionsData = await getTransactions(accessToken);
+      
+      setOpponents(opponentsData);
+      setTransactions(transactionsData);
+    }
 
-  useEffect(() => {
     const liffId = process.env.NEXT_PUBLIC_LIFF_ID!;
-
     liff.init({
       liffId: liffId,
     })
@@ -59,6 +59,9 @@ export default function TransactionsPageContent(props: Props) {
           .catch((err) => {
             alert(err);
           });
+      })
+      .then(() => {
+        fetchData();
       })
       .catch((err) => {
         alert(err);
@@ -104,6 +107,7 @@ export default function TransactionsPageContent(props: Props) {
 
       {isCreateModalOpen && (
         <CreateModalComponent
+          opponents={opponents}
           onClose={() => setIsCreateModalOpen(false)}
         />
       )}

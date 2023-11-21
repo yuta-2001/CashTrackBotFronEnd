@@ -1,36 +1,36 @@
 'use client';
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
-import { mockOpponents } from "@/app/_libs/placeholder-data";
 import ValidationErrorText from "../../common/ValidationErrorText";
+import { TOpponent, TTransactionForm } from "@/app/_libs/types";
+import { storeTransaction } from "@/app/_libs/data";
+import liff from "@line/liff";
 
 type CreateModalProps = {
+	opponents: TOpponent[] | null;
 	onClose: () => void;
 };
 
-type FormData = {
-	name: string;
-	opponent_id: number;
-	is_settled: boolean;
-	type: TransactionType;
-	amount: number;
-	memo: string;
-};
-
 const CreateModalComponent = (props: CreateModalProps) => {
-	const { onClose } = props;
+	const { opponents, onClose } = props;
 
 	const {
     register,
     handleSubmit,
     formState: { errors }
-	} = useForm<FormData>();
+	} = useForm<TTransactionForm>();
 
-	const onSubmit = (data: any) => {
-		console.log(data);
+	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
+		const accessToken = liff.getAccessToken();
+
+		if (accessToken) {
+				try {
+						await storeTransaction(data, accessToken);
+				} catch (e) {
+						alert('エラーが発生しました');
+				}
+		}
 	}
-
-	const opponents = mockOpponents;
 
 	return (
 		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">

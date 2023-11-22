@@ -18,7 +18,7 @@ export default function TransactionsPageContent() {
   const [selectedTransactions, setSelectedTransactions] = useState<TTransaction[]>([]);
   const [transactions, setTransactions] = useState<TTransaction[]>([]);
   const [user, setUser] = useState<TUser | null>(null);
-  const [opponents, setOpponents] = useState<TOpponent[] | null>(null);
+  const [opponents, setOpponents] = useState<TOpponent[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {

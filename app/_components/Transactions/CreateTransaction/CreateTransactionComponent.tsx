@@ -6,8 +6,8 @@ import { TOpponent, TTransaction } from '@/app/_libs/types';
 
 
 type Props = {
-  opponents: TOpponent[] | null;
-  transactions: TTransaction[] | null;
+  opponents: TOpponent[];
+  transactions: TTransaction[];
   setTransactions: (transactions: TTransaction[]) => void;
 }
 

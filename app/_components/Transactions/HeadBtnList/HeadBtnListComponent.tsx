@@ -7,8 +7,8 @@ import liff from "@line/liff"
 import { batchDeleteTransaction } from "@/app/_libs/data"
 
 type Props = {
-  opponents: TOpponent[] | null;
-  transactions: TTransaction[] | null;
+  opponents: TOpponent[];
+  transactions: TTransaction[];
   setTransactions: (transactions: TTransaction[]) => void;
   searchConditions: TSearchCondition;
   setSearchConditions: (condition: TSearchCondition) => void;

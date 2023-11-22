@@ -9,7 +9,7 @@ type SettleConfirmModalComponentProps = {
   calculateResults: TCalculateResult[];
   selectedTransactions: TTransaction[];
   setSelectedTransactions: (transactions: TTransaction[]) => void;
-  transactions: TTransaction[] | null;
+  transactions: TTransaction[];
   setTransactions: (transactions: TTransaction[]) => void;
 }
 

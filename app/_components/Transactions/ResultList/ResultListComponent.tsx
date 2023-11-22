@@ -5,9 +5,9 @@ import { TransactionType } from "@/app/_libs/enums";
 import EditModalComponent from "@/app/_components/Transactions/Modal/EditModalComponent";
 
 type Props = {
-  transactions: TTransaction[] | null;
+  transactions: TTransaction[];
   setTransactions: (transactions: TTransaction[]) => void;
-  opponents: TOpponent[] | null;
+  opponents: TOpponent[];
   searchConditions: TSearchCondition;
   selectedTransactions: TTransaction[];
   setSelectedTransactions: (transactions: TTransaction[]) => void;

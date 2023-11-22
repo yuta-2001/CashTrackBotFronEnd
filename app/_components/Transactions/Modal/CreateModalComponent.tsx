@@ -7,9 +7,9 @@ import { storeTransaction } from "@/app/_libs/data";
 import liff from "@line/liff";
 
 type CreateModalProps = {
-	opponents: TOpponent[] | null;
+	opponents: TOpponent[];
 	onClose: () => void;
-	transactions: TTransaction[] | null;
+	transactions: TTransaction[];
 	setTransactions: (transactions: TTransaction[]) => void;
 };
 

@@ -7,10 +7,10 @@ import { updateTransaction } from "@/app/_libs/data";
 import liff from "@line/liff";
 
 type EditModalProps = {
-	opponents: TOpponent[] | null;
+	opponents: TOpponent[];
   transaction: TTransaction;
 	onClose: () => void;
-	transactions: TTransaction[] | null;
+	transactions: TTransaction[];
 	setTransactions: (transactions: TTransaction[]) => void;
 };
 

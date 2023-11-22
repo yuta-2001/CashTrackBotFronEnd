@@ -1,7 +1,7 @@
 import { TTypeSelect, TOpponent, TOpponentSelect, TSearchCondition } from "@/app/_libs/types";
 
 type SearchBoxModalComponentProps = {
-  opponents : TOpponent[] | null;
+  opponents : TOpponent[];
   searchConditions: TSearchCondition;
   setSearchConditions: (conditions: TSearchCondition) => void;
 };

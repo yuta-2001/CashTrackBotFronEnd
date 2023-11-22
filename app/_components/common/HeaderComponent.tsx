@@ -1,5 +1,4 @@
 import { TUser } from '../../_libs/types'
-import Image from 'next/image'
 
 type HeaderComponentProps = {
   user: TUser | null
@@ -12,15 +11,11 @@ const HeaderComponent = (props: HeaderComponentProps) => {
     <header className="shadow p-4 py-3 flex items-center bg-green-500 w-full">
       <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
         { 
-          user?.pictureUrl ? (
-            <Image
+          user?.pictureUrl && (
+            <img
               src={user.pictureUrl}
               alt="user icon"
             />
-          ) : (
-            <span className="block text-center">
-              仮
-            </span>
           )
         }
       </div>

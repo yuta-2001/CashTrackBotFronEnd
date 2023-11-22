@@ -3,11 +3,14 @@ import React, { useEffect, useState } from "react";
 import { TTransaction, TOpponent, TSearchCondition } from "@/app/_libs/types";
 import { TransactionType } from "@/app/_libs/enums";
 import EditModalComponent from "@/app/_components/Transactions/Modal/EditModalComponent";
+import { getOpponents, getTransactions } from '@/app/_libs/data';
+import liff from "@line/liff";
 
 type Props = {
   transactions: TTransaction[];
   setTransactions: (transactions: TTransaction[]) => void;
   opponents: TOpponent[];
+  setOpponents: (opponents: TOpponent[]) => void;
   searchConditions: TSearchCondition;
   selectedTransactions: TTransaction[];
   setSelectedTransactions: (transactions: TTransaction[]) => void;
@@ -18,10 +21,25 @@ export default function ResultListComponent(props: Props) {
     transactions,
     setTransactions,
     opponents,
+    setOpponents,
     searchConditions,
     selectedTransactions,
     setSelectedTransactions,
   } = props;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const accessToken = liff.getAccessToken();
+      if (!accessToken) return;
+      const opponentsData = await getOpponents(accessToken);
+      const transactionsData = await getTransactions(accessToken);
+      
+      setOpponents(opponentsData);
+      setTransactions(transactionsData);
+    }
+
+    fetchData();
+  }, []);
 
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
   const [results, setResults] = useState<TTransaction[]>([]);

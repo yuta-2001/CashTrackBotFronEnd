@@ -8,7 +8,7 @@ import { TOpponent, TTransaction } from '@/app/_libs/types';
 type Props = {
   opponents: TOpponent[] | null;
   transactions: TTransaction[] | null;
-  setTransactions: (transactions: TTransaction[] | []) => void;
+  setTransactions: (transactions: TTransaction[]) => void;
 }
 
 export default function CreateTransactionComponent(props: Props) {

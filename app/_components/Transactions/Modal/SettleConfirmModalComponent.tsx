@@ -8,9 +8,9 @@ type SettleConfirmModalComponentProps = {
   setCalculateSettled: (calculate: TCalculateResult[]) => void;
   calculateResults: TCalculateResult[];
   selectedTransactions: TTransaction[];
-  setSelectedTransactions: (transactions: TTransaction[] | []) => void;
+  setSelectedTransactions: (transactions: TTransaction[]) => void;
   transactions: TTransaction[] | null;
-  setTransactions: (transactions: TTransaction[] | []) => void;
+  setTransactions: (transactions: TTransaction[]) => void;
 }
 
 const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) => {

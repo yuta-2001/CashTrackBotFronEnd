@@ -6,7 +6,7 @@ import EditModalComponent from "@/app/_components/Transactions/Modal/EditModalCo
 
 type Props = {
   transactions: TTransaction[] | null;
-  setTransactions: (transactions: TTransaction[] | []) => void;
+  setTransactions: (transactions: TTransaction[]) => void;
   opponents: TOpponent[] | null;
   searchConditions: TSearchCondition;
   selectedTransactions: TTransaction[];

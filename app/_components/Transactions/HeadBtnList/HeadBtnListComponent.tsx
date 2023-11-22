@@ -9,11 +9,11 @@ import { batchDeleteTransaction } from "@/app/_libs/data"
 type Props = {
   opponents: TOpponent[] | null;
   transactions: TTransaction[] | null;
-  setTransactions: (transactions: TTransaction[] | []) => void;
+  setTransactions: (transactions: TTransaction[]) => void;
   searchConditions: TSearchCondition;
   setSearchConditions: (condition: TSearchCondition) => void;
   selectedTransactions: TTransaction[];
-  setSelectedTransactions: (transactions: TTransaction[] | []) => void;
+  setSelectedTransactions: (transactions: TTransaction[]) => void;
 }
 
 export default function HeadBtnListComponent(props: Props) {

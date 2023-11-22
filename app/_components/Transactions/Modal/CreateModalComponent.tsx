@@ -74,7 +74,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 							{...register("opponent_id", { required: '相手の選択は必須です' })}
 						>
 							{
-								opponents?.map((opponent) => (
+								opponents.map((opponent) => (
 									<option key={opponent.id} value={opponent.id}>{opponent.name}</option>
 								))
 							}

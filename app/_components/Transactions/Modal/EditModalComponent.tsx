@@ -89,7 +89,7 @@ const EditModalComponent = (props: EditModalProps) => {
               defaultValue={transaction.opponent_id}
 						>
 							{
-								opponents?.map((opponent) => (
+								opponents.map((opponent) => (
 									<option 
                     key={opponent.id}
                     value={opponent.id}

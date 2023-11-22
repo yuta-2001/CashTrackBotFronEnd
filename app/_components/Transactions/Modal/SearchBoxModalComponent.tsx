@@ -71,7 +71,7 @@ const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
           >
             <option value="all">全て</option>
             {
-              opponents?.map((opponent) => (
+              opponents.map((opponent) => (
                 <option key={opponent.id} value={opponent.id}>{opponent.name}</option>
               ))
             }

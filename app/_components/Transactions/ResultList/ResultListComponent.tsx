@@ -24,7 +24,7 @@ export default function ResultListComponent(props: Props) {
   } = props;
 
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
-  const [results, setResults] = useState<TTransaction[] | null | undefined>(transactions);
+  const [results, setResults] = useState<TTransaction[]>([]);
 
   useEffect(() => {
     if (transactions) {
@@ -56,7 +56,7 @@ export default function ResultListComponent(props: Props) {
 
   return (
     <div className="flex-1 overflow-y-auto p-4">
-      {results?.map((result) => (
+      {results.map((result) => (
         <div key={result.id} className="mb-4 p-4 bg-white rounded-lg shadow flex items-center justify-between">
           <input
             type="checkbox"

@@ -2,13 +2,14 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
 import ValidationErrorText from "../../common/ValidationErrorText";
-import { TTransaction, TTransactionForm, TOpponent } from "@/app/_libs/types";
+import { TTransaction, TTransactionForm } from "@/app/_libs/types";
 import { updateTransaction } from "@/app/_libs/data";
 import { useLiff } from "@/app/_context/LiffProvider";
 import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
+import { useOpponents } from "@/app/_context/OpponentsProvider";
+import { useEffect, useCallback } from "react";
 
 type EditModalProps = {
-	opponents: TOpponent[];
   transaction: TTransaction;
 	onClose: () => void;
 };
@@ -23,13 +24,11 @@ type FormData = {
 };
 
 const EditModalComponent = (props: EditModalProps) => {
-	const { opponents, transaction, onClose } = props;
+	const { transaction, onClose } = props;
 	const liff = useLiff();
 	const transactions = useTransactions();
 	const setTransactions = useTransactionsUpdate();
-	if (liff === null) return;
-	if (setTransactions === undefined) return;
-	if (transactions === undefined) return;
+	const opponents = useOpponents();
 
 	const {
     register,
@@ -37,19 +36,29 @@ const EditModalComponent = (props: EditModalProps) => {
     formState: { errors }
 	} = useForm<FormData>();
 
-	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
+	const onSubmit = useCallback<SubmitHandler<TTransactionForm>>(
+		async (data: TTransactionForm) => {
+			if (liff === null || transactions === undefined || setTransactions === undefined) return;
+	
 			try {
-					const updatedTransaction: TTransaction = await updateTransaction(transaction.id, data, liff);
-					if (updatedTransaction && transactions) {
-						setTransactions(transactions!.map((transaction) => {
-							return transaction.id === updatedTransaction.id ? updatedTransaction : transaction;
-						}));
-					};
+				const updatedTransaction: TTransaction = await updateTransaction(transaction.id, data, liff);
+				if (updatedTransaction && transactions) {
+					setTransactions(transactions.map((transaction) => {
+						return transaction.id === updatedTransaction.id ? updatedTransaction : transaction;
+					}));
+				}
 			} catch (e) {
-					alert('エラーが発生しました');
+				alert('エラーが発生しました');
 			}
-		onClose();
-	}
+	
+			onClose();
+		},
+		[liff, transactions, setTransactions, onClose]
+	);
+
+	useEffect(() => {
+		if (opponents === undefined || setTransactions === undefined || liff === null) return;
+	}, [opponents, setTransactions, liff]);
 
 	return (
 		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-20">

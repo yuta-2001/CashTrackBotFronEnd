@@ -121,13 +121,11 @@ export default function ResultListComponent() {
   }, [results, opponents, handleCheck]);
 
 
-
   return (
     <div className="flex-1 overflow-y-auto p-4">
       {resultList}
       {targetEditTransaction && (
         <EditModalComponent
-          opponents={opponents}
           transaction={targetEditTransaction}
           onClose={() => setTargetEditTransaction(null)}
         />

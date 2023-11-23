@@ -2,7 +2,18 @@ import { TTransaction, TTransactionForm } from "./types";
 
 const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
 
-export async function getOpponents(accessToken: string) {
+async function getAccessToken(liff: any) {
+  const accessToken = await liff.getAccessToken();
+
+  if (!accessToken) {
+    throw new Error("Access token not found");
+  }
+
+  return accessToken;
+}
+
+export async function getOpponents(liff: any) {
+  const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/opponents?${query}`);
@@ -16,7 +27,8 @@ export async function getOpponents(accessToken: string) {
 }
 
 
-export async function getTransactions(accessToken: string) {
+export async function getTransactions(liff: any) {
+  const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions?${query}`);
@@ -30,7 +42,8 @@ export async function getTransactions(accessToken: string) {
 }
 
 
-export async function storeTransaction(transaction: any, accessToken: string) {
+export async function storeTransaction(transaction: any, liff: any) {
+  const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions?${query}`, {
@@ -50,7 +63,8 @@ export async function storeTransaction(transaction: any, accessToken: string) {
 }
 
 
-export async function updateTransaction(transactionId: number, transaction: TTransactionForm, accessToken: string): Promise<TTransaction> {
+export async function updateTransaction(transactionId: number, transaction: TTransactionForm, liff: any): Promise<TTransaction> {
+  const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions/${transactionId}?${query}`, {
@@ -72,7 +86,8 @@ export async function updateTransaction(transactionId: number, transaction: TTra
 }
 
 
-export async function batchSettleTransaction(ids: Array<Number>, accessToken: string) {
+export async function batchSettleTransaction(ids: Array<Number>, liff: any) {
+  const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions/batch-settle?${query}`, {
@@ -94,7 +109,8 @@ export async function batchSettleTransaction(ids: Array<Number>, accessToken: st
 }
 
 
-export async function deleteTransaction(transaction: TTransaction, accessToken: string) {
+export async function deleteTransaction(transaction: TTransaction, liff: any) {
+  const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions/${transaction.id}?${query}`, {
@@ -110,7 +126,8 @@ export async function deleteTransaction(transaction: TTransaction, accessToken: 
 }
 
 
-export async function batchDeleteTransaction(ids: Array<Number>, accessToken: string) {
+export async function batchDeleteTransaction(ids: Array<Number>, liff: any) {
+  const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions/batch-delete?${query}`, {

@@ -4,14 +4,13 @@ import { TransactionType } from "@/app/_libs/enums";
 import ValidationErrorText from "../../common/ValidationErrorText";
 import { TTransaction, TTransactionForm, TOpponent } from "@/app/_libs/types";
 import { updateTransaction } from "@/app/_libs/data";
-import liff from "@line/liff";
+import { useLiff } from "@/app/_context/LiffProvider";
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
 
 type EditModalProps = {
 	opponents: TOpponent[];
   transaction: TTransaction;
 	onClose: () => void;
-	transactions: TTransaction[];
-	setTransactions: (transactions: TTransaction[]) => void;
 };
 
 type FormData = {
@@ -24,7 +23,13 @@ type FormData = {
 };
 
 const EditModalComponent = (props: EditModalProps) => {
-	const { opponents, transaction, onClose, transactions, setTransactions } = props;
+	const { opponents, transaction, onClose } = props;
+	const liff = useLiff();
+	const transactions = useTransactions();
+	const setTransactions = useTransactionsUpdate();
+	if (liff === null) return;
+	if (setTransactions === undefined) return;
+	if (transactions === undefined) return;
 
 	const {
     register,
@@ -33,20 +38,16 @@ const EditModalComponent = (props: EditModalProps) => {
 	} = useForm<FormData>();
 
 	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
-		const accessToken = liff.getAccessToken();
-
-		if (accessToken) {
-				try {
-						const updatedTransaction: TTransaction = await updateTransaction(transaction.id, data, accessToken);
-						if (updatedTransaction && transactions) {
-							setTransactions(transactions!.map((transaction) => {
-								return transaction.id === updatedTransaction.id ? updatedTransaction : transaction;
-							}));
-						};
-				} catch (e) {
-						alert('エラーが発生しました');
-				}
-		}
+			try {
+					const updatedTransaction: TTransaction = await updateTransaction(transaction.id, data, liff);
+					if (updatedTransaction && transactions) {
+						setTransactions(transactions!.map((transaction) => {
+							return transaction.id === updatedTransaction.id ? updatedTransaction : transaction;
+						}));
+					};
+			} catch (e) {
+					alert('エラーが発生しました');
+			}
 		onClose();
 	}
 

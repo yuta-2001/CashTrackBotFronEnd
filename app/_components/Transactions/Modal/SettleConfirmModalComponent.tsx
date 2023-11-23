@@ -1,16 +1,14 @@
-import { TCalculateResult, TTransaction } from '../../../_libs/types';
+import { TCalculateResult } from '../../../_libs/types';
 import { CalculateTransactionType } from '../../../_libs/enums';
 import { batchSettleTransaction } from '../../../_libs/data';
-import liff from '@line/liff';
+import { useTransactions, useTransactionsUpdate } from '../../../_context/TransactionsProvider';
+import { useSelectedTransactions, useSelectedTransactionsUpdate } from '../../../_context/Transactions/SelectedTransactionsProvider';
+import { useLiff } from '../../../_context/LiffProvider';
 
 type SettleConfirmModalComponentProps = {
   setIsOpenSettleConfirm: (isOpen: boolean) => void;
   setCalculateSettled: (calculate: TCalculateResult[]) => void;
   calculateResults: TCalculateResult[];
-  selectedTransactions: TTransaction[];
-  setSelectedTransactions: (transactions: TTransaction[]) => void;
-  transactions: TTransaction[];
-  setTransactions: (transactions: TTransaction[]) => void;
 }
 
 const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) => {
@@ -18,14 +16,25 @@ const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) =>
     setIsOpenSettleConfirm,
     setCalculateSettled,
     calculateResults,
-    selectedTransactions,
-    setSelectedTransactions,
-    transactions,
-    setTransactions,
   } = props;
   const onClose = () => {
     setIsOpenSettleConfirm(false);
     setCalculateSettled([]);
+  }
+
+  const transactions = useTransactions();
+  const setTransactions = useTransactionsUpdate();
+  const selectedTransactions = useSelectedTransactions();
+  const setSelectedTransactions = useSelectedTransactionsUpdate();
+  const liff = useLiff();
+
+  if (transactions === undefined ||
+      setTransactions === undefined ||
+      selectedTransactions === undefined ||
+      setSelectedTransactions === undefined ||
+      liff === null
+    ) {
+    return;
   }
 
   const onSubmit = async () => {
@@ -33,11 +42,8 @@ const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) =>
       return settlement.id;
     });
 
-    const accessToken = liff.getAccessToken();
-    if (!accessToken) return;
-
     try {
-      await batchSettleTransaction(transactionIds, accessToken);
+      await batchSettleTransaction(transactionIds, liff);
     } catch (e) {
       alert('エラーが発生しました');
     }

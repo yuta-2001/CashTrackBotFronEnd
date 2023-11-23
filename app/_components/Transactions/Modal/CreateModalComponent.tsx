@@ -2,19 +2,27 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
 import ValidationErrorText from "../../common/ValidationErrorText";
-import { TOpponent, TTransactionForm, TTransaction } from "@/app/_libs/types";
+import { TTransactionForm } from "@/app/_libs/types";
 import { storeTransaction } from "@/app/_libs/data";
-import liff from "@line/liff";
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
+import { useOpponents } from "@/app/_context/OpponentsProvider";
+import { useLiff } from "@/app/_context/LiffProvider";
 
 type CreateModalProps = {
-	opponents: TOpponent[];
 	onClose: () => void;
-	transactions: TTransaction[];
-	setTransactions: (transactions: TTransaction[]) => void;
 };
 
 const CreateModalComponent = (props: CreateModalProps) => {
-	const { opponents, onClose, transactions, setTransactions } = props;
+	const { onClose } = props;
+
+	const transactions = useTransactions();
+	const setTransactions = useTransactionsUpdate();
+	const opponents = useOpponents();
+	const liff = useLiff();
+
+	if (transactions === undefined || setTransactions === undefined || opponents === undefined || liff === null) {
+		return;
+	}
 
 	const {
     register,
@@ -23,15 +31,11 @@ const CreateModalComponent = (props: CreateModalProps) => {
 	} = useForm<TTransactionForm>();
 
 	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
-		const accessToken = liff.getAccessToken();
-
-		if (accessToken) {
-			try {
-					const createdTransaction = await storeTransaction(data, accessToken);
-					setTransactions([createdTransaction, ...transactions!]);
-			} catch (e) {
-					alert('エラーが発生しました');
-			}
+		try {
+				const createdTransaction = await storeTransaction(data, liff);
+				setTransactions([createdTransaction, ...transactions!]);
+		} catch (e) {
+				alert('エラーが発生しました');
 		}
 
 		onClose();

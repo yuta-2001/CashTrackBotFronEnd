@@ -1,50 +1,66 @@
 'use client'
 import React, { useEffect, useState } from "react";
-import { TTransaction, TOpponent, TSearchCondition } from "@/app/_libs/types";
+import { TTransaction } from "@/app/_libs/types";
 import { TransactionType } from "@/app/_libs/enums";
 import EditModalComponent from "@/app/_components/Transactions/Modal/EditModalComponent";
 import { getOpponents, getTransactions } from '@/app/_libs/data';
-import liff from "@line/liff";
+import { useOpponents, useOpponentsUpdate } from "@/app/_context/OpponentsProvider";
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
+import { useSearchConditions } from "@/app/_context/Transactions/SearchConditionsProvider";
+import { useSelectedTransactions, useSelectedTransactionsUpdate } from "@/app/_context/Transactions/SelectedTransactionsProvider";
+import { useLiff } from "@/app/_context/LiffProvider";
 
-type Props = {
-  transactions: TTransaction[];
-  setTransactions: (transactions: TTransaction[]) => void;
-  opponents: TOpponent[];
-  setOpponents: (opponents: TOpponent[]) => void;
-  searchConditions: TSearchCondition;
-  selectedTransactions: TTransaction[];
-  setSelectedTransactions: (transactions: TTransaction[]) => void;
-};
+export default function ResultListComponent() {
 
-export default function ResultListComponent(props: Props) {
-  const {
-    transactions,
-    setTransactions,
-    opponents,
-    setOpponents,
-    searchConditions,
-    selectedTransactions,
-    setSelectedTransactions,
-  } = props;
+  const opponents = useOpponents();
+  const setOpponents = useOpponentsUpdate();
+  const transactions = useTransactions();
+  const setTransactions = useTransactionsUpdate();
+  const searchConditions = useSearchConditions();
+  const selectedTransactions = useSelectedTransactions();
+  const setSelectedTransactions = useSelectedTransactionsUpdate();
+  const liff = useLiff();
+
 
   useEffect(() => {
+    if (opponents === undefined ||
+        setOpponents === undefined ||
+        transactions === undefined ||
+        setTransactions === undefined ||
+        searchConditions === undefined ||
+        selectedTransactions === undefined ||
+        setSelectedTransactions === undefined ||
+        liff === null
+    ) {
+      return;
+    }
     const fetchData = async () => {
-      const accessToken = liff.getAccessToken();
-      if (!accessToken) return;
-      const opponentsData = await getOpponents(accessToken);
-      const transactionsData = await getTransactions(accessToken);
+      const opponentsData = await getOpponents(liff);
+      const transactionsData = await getTransactions(liff);
       
       setOpponents(opponentsData);
       setTransactions(transactionsData);
     }
 
     fetchData();
-  }, []);
+  }, [liff, setOpponents, setTransactions, setSelectedTransactions]);
 
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
   const [results, setResults] = useState<TTransaction[]>([]);
 
   useEffect(() => {
+    if (opponents === undefined ||
+      setOpponents === undefined ||
+      transactions === undefined ||
+      setTransactions === undefined ||
+      searchConditions === undefined ||
+      selectedTransactions === undefined ||
+      setSelectedTransactions === undefined ||
+      liff === null
+    ) {
+      return;
+    }
+
     if (transactions) {
       setResults(transactions.filter((transaction) => {
         if (searchConditions.type !== 'all' && transaction.type !== Number(searchConditions.type)) {
@@ -62,9 +78,21 @@ export default function ResultListComponent(props: Props) {
         return true;
       }));
     }
-  }, [searchConditions, transactions]);
+  }, [liff, opponents, searchConditions, selectedTransactions, setOpponents, setTransactions, transactions]);
 
   const handleCheck = (transaction: TTransaction, isChecked: boolean) => {
+    if (opponents === undefined ||
+      setOpponents === undefined ||
+      transactions === undefined ||
+      setTransactions === undefined ||
+      searchConditions === undefined ||
+      selectedTransactions === undefined ||
+      setSelectedTransactions === undefined ||
+      liff === null
+    ) {
+      return;
+    }
+
     if (isChecked) {
       setSelectedTransactions([...selectedTransactions, transaction]);
     } else {
@@ -104,8 +132,6 @@ export default function ResultListComponent(props: Props) {
           opponents={opponents}
           transaction={targetEditTransaction}
           onClose={() => setTargetEditTransaction(null)}
-          transactions={transactions}
-          setTransactions={setTransactions}
         />
       )}
     </div>

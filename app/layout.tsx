@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
-import './globals.css'
+import './globals.css';
+import { TransactionsProvider } from './_context/TransactionsProvider';
+import { OpponentsProvider } from './_context/OpponentsProvider';
+import HeaderComponent from './_components/common/HeaderComponent';
+import { LiffProvider } from './_context/LiffProvider';
 
 export const metadata: Metadata = {
   title: 'お金貸し借り管理アプリ',
@@ -11,11 +15,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+
   return (
-    <html lang="en">
-      <body className="bg-gray-100">
-        {children}
-      </body>
-    </html>
+    <LiffProvider>
+      <OpponentsProvider>
+        <TransactionsProvider>
+          <html lang="en">
+            <body className="bg-gray-100">
+              <HeaderComponent />
+              {children}
+            </body>
+          </html>
+        </TransactionsProvider>
+      </OpponentsProvider>
+    </LiffProvider>
   )
 }

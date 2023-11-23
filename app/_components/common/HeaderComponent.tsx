@@ -1,16 +1,30 @@
-import { TUser } from '../../_libs/types'
+'use client';
+import { useEffect, useState } from 'react'
+import { useLiff } from '../../_context/LiffProvider'
 
-type HeaderComponentProps = {
-  user: TUser | null
-}
+const HeaderComponent = () => {
+  const [user, setUser] = useState<any | null>(null);
+  const liff = useLiff();
+  console.log('liff', liff);
 
-const HeaderComponent = (props: HeaderComponentProps) => {
-  const { user } = props
+  useEffect(() => {
+    if (!liff) return;
+    const fetchUserProfile = async () => {
+      const profile = await liff.getProfile();
+      const userData = {
+        name: profile.displayName,
+        pictureUrl: profile.pictureUrl,
+      };
+      setUser(userData);
+    }
+
+    fetchUserProfile();
+  }, [liff]);
 
   return (
     <header className="shadow p-4 py-3 flex items-center bg-green-500 w-full">
       <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-        { 
+        {
           user?.pictureUrl && (
             <img
               src={user.pictureUrl}

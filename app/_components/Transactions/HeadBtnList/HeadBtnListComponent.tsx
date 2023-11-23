@@ -1,36 +1,37 @@
 import React, { useState } from "react"
-import { TTransaction, TOpponent, TCalculateResult, TSearchCondition } from "@/app/_libs/types"
+import { TCalculateResult } from "@/app/_libs/types"
 import { TransactionType, CalculateTransactionType } from "@/app/_libs/enums"
 import SearchBoxModalComponent from "@/app/_components/Transactions/Modal/SearchBoxModalComponent"
 import SettleConfirmModalComponent from "@/app/_components/Transactions/Modal/SettleConfirmModalComponent"
-import liff from "@line/liff"
 import { batchDeleteTransaction } from "@/app/_libs/data"
+import { useSelectedTransactions, useSelectedTransactionsUpdate } from "@/app/_context/Transactions/SelectedTransactionsProvider"
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider"
+import { useOpponents } from "@/app/_context/OpponentsProvider"
+import { useSearchConditions } from "@/app/_context/Transactions/SearchConditionsProvider"
+import { useLiff } from "@/app/_context/LiffProvider"
 
-type Props = {
-  opponents: TOpponent[];
-  transactions: TTransaction[];
-  setTransactions: (transactions: TTransaction[]) => void;
-  searchConditions: TSearchCondition;
-  setSearchConditions: (condition: TSearchCondition) => void;
-  selectedTransactions: TTransaction[];
-  setSelectedTransactions: (transactions: TTransaction[]) => void;
-}
-
-export default function HeadBtnListComponent(props: Props) {
-
-  const {
-    opponents,
-    transactions,
-    setTransactions,
-    searchConditions,
-    setSearchConditions,
-    selectedTransactions,
-    setSelectedTransactions,
-  } = props;
-
+export default function HeadBtnListComponent() {
   const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [calculateSettled, setCalculateSettled] = useState<TCalculateResult[]>([]);
+
+  const selectedTransactions = useSelectedTransactions();
+  const setSelectedTransactions = useSelectedTransactionsUpdate();
+  const transactions = useTransactions();
+  const setTransactions = useTransactionsUpdate();
+  const opponents = useOpponents();
+  const searchConditions = useSearchConditions();
+  const liff = useLiff();
+
+  if (selectedTransactions === undefined ||
+      setSelectedTransactions === undefined ||
+      transactions === undefined ||
+      setTransactions === undefined ||
+      opponents === undefined ||
+      liff === null
+  ) {
+    return;
+  }
 
   const handleDeleteConfirm = async () => {
     if (selectedTransactions.length === 0) {
@@ -46,11 +47,8 @@ export default function HeadBtnListComponent(props: Props) {
       return transaction.id;
     });
 
-    const accessToken = liff.getAccessToken();
-    if (!accessToken) return;
-
     try {
-      await batchDeleteTransaction(transactionIds, accessToken);
+      await batchDeleteTransaction(transactionIds, liff);
     } catch (e) {
       alert('エラーが発生しました');
     }
@@ -165,11 +163,7 @@ export default function HeadBtnListComponent(props: Props) {
       </button>
 
       {isSearchVisible && (
-        <SearchBoxModalComponent
-          opponents={opponents}
-          searchConditions={searchConditions}
-          setSearchConditions={setSearchConditions}
-        />
+        <SearchBoxModalComponent />
       )}
 
       {isOpenSettleConfirm && (
@@ -177,10 +171,6 @@ export default function HeadBtnListComponent(props: Props) {
           setIsOpenSettleConfirm={setIsOpenSettleConfirm}
           setCalculateSettled={setCalculateSettled}
           calculateResults={calculateSettled}
-          selectedTransactions={selectedTransactions}
-          setSelectedTransactions={setSelectedTransactions}
-          transactions={transactions}
-          setTransactions={setTransactions}
         />
       )}
     </div>

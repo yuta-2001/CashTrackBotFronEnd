@@ -1,20 +1,18 @@
-import { TTypeSelect, TOpponent, TOpponentSelect, TSearchCondition } from "@/app/_libs/types";
+import { useSearchConditions, useSearchConditionsUpdate } from "@/app/_context/Transactions/SearchConditionsProvider";
+import { useOpponents } from "@/app/_context/OpponentsProvider";
+import { TTypeSelect, TOpponentSelect } from "@/app/_libs/types";
 
-type SearchBoxModalComponentProps = {
-  opponents : TOpponent[] | null;
-  searchConditions: TSearchCondition;
-  setSearchConditions: (conditions: TSearchCondition) => void;
-};
+const SearchBoxModalComponent = () => {
+  const searchConditions = useSearchConditions();
+  const setSearchConditions = useSearchConditionsUpdate();
+  const opponents = useOpponents();
 
-const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
-  const {
-    opponents,
-    searchConditions,
-    setSearchConditions,
-  } = props;
+  if (searchConditions === undefined || setSearchConditions === undefined || opponents === undefined) {
+    return;
+  }
 
   return (
-    <div className="bg-white p-4 shadow-md w-2/3 absolute top-14 right-0 rounded-md">
+    <div className="bg-white p-4 shadow-md w-2/3 absolute top-14 right-0 rounded-md z-20">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {/* 取引タイプ選択 */}
         <div>
@@ -71,7 +69,7 @@ const SearchBoxModalComponent = (props: SearchBoxModalComponentProps) => {
           >
             <option value="all">全て</option>
             {
-              opponents?.map((opponent) => (
+              opponents.map((opponent) => (
                 <option key={opponent.id} value={opponent.id}>{opponent.name}</option>
               ))
             }

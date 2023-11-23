@@ -1,16 +1,14 @@
-import { TCalculateResult, TTransaction } from '../../../_libs/types';
+import { TCalculateResult } from '../../../_libs/types';
 import { CalculateTransactionType } from '../../../_libs/enums';
 import { batchSettleTransaction } from '../../../_libs/data';
-import liff from '@line/liff';
+import { useTransactions, useTransactionsUpdate } from '../../../_context/TransactionsProvider';
+import { useSelectedTransactions, useSelectedTransactionsUpdate } from '../../../_context/Transactions/SelectedTransactionsProvider';
+import { useLiff } from '../../../_context/LiffProvider';
 
 type SettleConfirmModalComponentProps = {
   setIsOpenSettleConfirm: (isOpen: boolean) => void;
   setCalculateSettled: (calculate: TCalculateResult[]) => void;
   calculateResults: TCalculateResult[];
-  selectedTransactions: TTransaction[];
-  setSelectedTransactions: (transactions: TTransaction[] | []) => void;
-  transactions: TTransaction[] | null;
-  setTransactions: (transactions: TTransaction[] | null) => void;
 }
 
 const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) => {
@@ -18,14 +16,25 @@ const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) =>
     setIsOpenSettleConfirm,
     setCalculateSettled,
     calculateResults,
-    selectedTransactions,
-    setSelectedTransactions,
-    transactions,
-    setTransactions,
   } = props;
   const onClose = () => {
     setIsOpenSettleConfirm(false);
     setCalculateSettled([]);
+  }
+
+  const transactions = useTransactions();
+  const setTransactions = useTransactionsUpdate();
+  const selectedTransactions = useSelectedTransactions();
+  const setSelectedTransactions = useSelectedTransactionsUpdate();
+  const liff = useLiff();
+
+  if (transactions === undefined ||
+      setTransactions === undefined ||
+      selectedTransactions === undefined ||
+      setSelectedTransactions === undefined ||
+      liff === null
+    ) {
+    return;
   }
 
   const onSubmit = async () => {
@@ -33,11 +42,8 @@ const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) =>
       return settlement.id;
     });
 
-    const accessToken = liff.getAccessToken();
-    if (!accessToken) return;
-
     try {
-      await batchSettleTransaction(transactionIds, accessToken);
+      await batchSettleTransaction(transactionIds, liff);
     } catch (e) {
       alert('エラーが発生しました');
     }
@@ -57,7 +63,7 @@ const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) =>
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-20">
       <div className="bg-white w-11/12 max-w-6xl h-85% overflow-auto rounded shadow-lg p-6 relative">
         <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
         <h2 className="text-lg font-bold mb-4">清算額を確認</h2>

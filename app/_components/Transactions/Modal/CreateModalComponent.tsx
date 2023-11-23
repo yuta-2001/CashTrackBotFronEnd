@@ -2,19 +2,27 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
 import ValidationErrorText from "../../common/ValidationErrorText";
-import { TOpponent, TTransactionForm, TTransaction } from "@/app/_libs/types";
+import { TTransactionForm } from "@/app/_libs/types";
 import { storeTransaction } from "@/app/_libs/data";
-import liff from "@line/liff";
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
+import { useOpponents } from "@/app/_context/OpponentsProvider";
+import { useLiff } from "@/app/_context/LiffProvider";
 
 type CreateModalProps = {
-	opponents: TOpponent[] | null;
 	onClose: () => void;
-	transactions: TTransaction[] | null;
-	setTransactions: (transactions: TTransaction[]) => void;
 };
 
 const CreateModalComponent = (props: CreateModalProps) => {
-	const { opponents, onClose, transactions, setTransactions } = props;
+	const { onClose } = props;
+
+	const transactions = useTransactions();
+	const setTransactions = useTransactionsUpdate();
+	const opponents = useOpponents();
+	const liff = useLiff();
+
+	if (transactions === undefined || setTransactions === undefined || opponents === undefined || liff === null) {
+		return;
+	}
 
 	const {
     register,
@@ -23,22 +31,18 @@ const CreateModalComponent = (props: CreateModalProps) => {
 	} = useForm<TTransactionForm>();
 
 	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
-		const accessToken = liff.getAccessToken();
-
-		if (accessToken) {
-			try {
-					const createdTransaction = await storeTransaction(data, accessToken);
-					setTransactions([createdTransaction, ...transactions!]);
-			} catch (e) {
-					alert('エラーが発生しました');
-			}
+		try {
+				const createdTransaction = await storeTransaction(data, liff);
+				setTransactions([createdTransaction, ...transactions!]);
+		} catch (e) {
+				alert('エラーが発生しました');
 		}
 
 		onClose();
 	}
 
 	return (
-		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-20">
 			<div style={{ maxHeight: '90%' }} className="bg-white w-11/12 max-w-6xl h-auto overflow-auto rounded shadow-lg p-6 relative">
 				<button
 					onClick={onClose}
@@ -74,7 +78,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 							{...register("opponent_id", { required: '相手の選択は必須です' })}
 						>
 							{
-								opponents?.map((opponent) => (
+								opponents.map((opponent) => (
 									<option key={opponent.id} value={opponent.id}>{opponent.name}</option>
 								))
 							}

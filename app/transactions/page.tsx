@@ -1,5 +1,5 @@
 'use client';
-import React, { Suspense } from 'react';
+import React from 'react';
 import HeadBtnListComponent from '../_components/Transactions/HeadBtnList/HeadBtnListComponent';
 import CreateTransactionComponent from '../_components/Transactions/CreateTransaction/CreateTransactionComponent';
 import ResultListComponent from '../_components/Transactions/ResultList/ResultListComponent';
@@ -11,9 +11,7 @@ export default function TransactionsPage() {
     <SearchConditionsProvider>
       <SelectedTransactionsProvider>
         <HeadBtnListComponent />
-        <Suspense fallback='loading'>
-          <ResultListComponent />
-        </Suspense>
+        <ResultListComponent />
         <CreateTransactionComponent />
       </SelectedTransactionsProvider>
     </SearchConditionsProvider>

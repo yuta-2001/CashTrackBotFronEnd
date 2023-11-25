@@ -5,6 +5,7 @@ import { OpponentsProvider } from './_context/OpponentsProvider';
 import HeaderComponent from './_components/common/HeaderComponent';
 import FooterComponent from './_components/common/FooterComponent';
 import { LiffProvider } from './_context/LiffProvider';
+import { SearchConditionsProvider } from './_context/Transactions/SearchConditionsProvider';
 
 export const metadata: Metadata = {
   title: 'お金貸し借り管理アプリ',
@@ -21,13 +22,15 @@ export default function RootLayout({
     <LiffProvider>
       <OpponentsProvider>
         <TransactionsProvider>
-          <html lang="en">
-            <body className="bg-gray-100">
-              <HeaderComponent />
-              {children}
-              <FooterComponent />
-            </body>
-          </html>
+          <SearchConditionsProvider>
+            <html lang="en">
+              <body className="bg-gray-100">
+                <HeaderComponent />
+                {children}
+                <FooterComponent />
+              </body>
+            </html>
+          </SearchConditionsProvider>
         </TransactionsProvider>
       </OpponentsProvider>
     </LiffProvider>

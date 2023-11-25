@@ -33,7 +33,7 @@ export default function FooterComponent () {
           <div>
             <MessageSquare className="mx-auto w-10 h-10" />
             <span className="text-xs font-bold">
-              トークに移動
+              トークに戻る
             </span>
           </div>
         </button>

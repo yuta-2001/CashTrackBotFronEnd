@@ -5,8 +5,8 @@ import { TransactionType } from "@/app/_libs/enums";
 import EditModalComponent from "@/app/_components/Transactions/Modal/EditModalComponent";
 import { getOpponents, getTransactions } from '@/app/_libs/data';
 import { useOpponents, useOpponentsUpdate } from "@/app/_context/OpponentsProvider";
-import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
-import { useSearchConditions } from "@/app/_context/Transactions/SearchConditionsProvider";
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/Transactions/TransactionsProvider";
+import { useSearchConditions } from "@/app/_context/SearchConditionsProvider";
 import { useSelectedTransactions, useSelectedTransactionsUpdate } from "@/app/_context/Transactions/SelectedTransactionsProvider";
 import { useLiff } from "@/app/_context/LiffProvider";
 

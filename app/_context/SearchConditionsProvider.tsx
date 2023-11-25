@@ -1,6 +1,6 @@
 'use client'
 import React, { createContext, useState, ReactNode, Dispatch, SetStateAction} from 'react';
-import { TSearchCondition } from '../../_libs/types';
+import { TSearchCondition } from '../_libs/types';
 import { useContext } from 'react';
 
 type SearchConditionsUpdateType = Dispatch<SetStateAction<TSearchCondition>>;

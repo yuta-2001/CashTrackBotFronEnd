@@ -5,7 +5,7 @@ import ValidationErrorText from "../../common/ValidationErrorText";
 import { TTransaction, TTransactionForm } from "@/app/_libs/types";
 import { updateTransaction } from "@/app/_libs/data";
 import { useLiff } from "@/app/_context/LiffProvider";
-import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/Transactions/TransactionsProvider";
 import { useOpponents } from "@/app/_context/OpponentsProvider";
 import { useEffect, useCallback } from "react";
 

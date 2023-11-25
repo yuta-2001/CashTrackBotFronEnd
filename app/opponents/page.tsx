@@ -2,7 +2,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useOpponents } from '../_context/OpponentsProvider';
-import { useSearchConditionsUpdate } from '../_context/Transactions/SearchConditionsProvider';
+import { useSearchConditionsUpdate } from '../_context/SearchConditionsProvider';
 
 export default function OpponentsPage() {
   const router = useRouter();

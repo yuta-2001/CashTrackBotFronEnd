@@ -1,7 +1,7 @@
 import { TCalculateResult } from '../../../_libs/types';
 import { CalculateTransactionType } from '../../../_libs/enums';
 import { batchSettleTransaction } from '../../../_libs/data';
-import { useTransactions, useTransactionsUpdate } from '../../../_context/TransactionsProvider';
+import { useTransactions, useTransactionsUpdate } from '../../../_context/Transactions/TransactionsProvider';
 import { useSelectedTransactions, useSelectedTransactionsUpdate } from '../../../_context/Transactions/SelectedTransactionsProvider';
 import { useLiff } from '../../../_context/LiffProvider';
 

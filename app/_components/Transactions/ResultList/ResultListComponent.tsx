@@ -3,9 +3,8 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { TTransaction } from "@/app/_libs/types";
 import { TransactionType } from "@/app/_libs/enums";
 import EditModalComponent from "@/app/_components/Transactions/Modal/EditModalComponent";
-import { getOpponents, getTransactions } from '@/app/_libs/data';
-import { useOpponents, useOpponentsUpdate } from "@/app/_context/OpponentsProvider";
-import { useTransactions, useTransactionsUpdate } from "@/app/_context/Transactions/TransactionsProvider";
+import { useOpponents } from "@/app/_context/OpponentsProvider";
+import { useTransactions } from "@/app/_context/Transactions/TransactionsProvider";
 import { useSearchConditions } from "@/app/_context/SearchConditionsProvider";
 import { useSelectedTransactions, useSelectedTransactionsUpdate } from "@/app/_context/Transactions/SelectedTransactionsProvider";
 import { useLiff } from "@/app/_context/LiffProvider";
@@ -13,9 +12,7 @@ import { useLiff } from "@/app/_context/LiffProvider";
 export default function ResultListComponent() {
 
   const opponents = useOpponents();
-  const setOpponents = useOpponentsUpdate();
   const transactions = useTransactions();
-  const setTransactions = useTransactionsUpdate();
   const searchConditions = useSearchConditions();
   const selectedTransactions = useSelectedTransactions();
   const setSelectedTransactions = useSelectedTransactionsUpdate();
@@ -23,26 +20,6 @@ export default function ResultListComponent() {
 
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
   const [results, setResults] = useState<TTransaction[]>([]);
-
-  useEffect(() => {
-    if (opponents === undefined ||
-        setOpponents === undefined ||
-        setTransactions === undefined ||
-        liff === null
-    ) {
-      return;
-    }
-
-    const fetchData = async () => {
-      const opponentsData = await getOpponents(liff);
-      const transactionsData = await getTransactions(liff);
-      
-      setOpponents(opponentsData);
-      setTransactions(transactionsData);
-    }
-
-    fetchData();
-  }, [liff, setOpponents, setTransactions]);
 
   useEffect(() => {
     if (

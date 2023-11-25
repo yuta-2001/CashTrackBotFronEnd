@@ -44,3 +44,9 @@ export type TTransactionForm = {
   'amount': number,
   'memo': string | null,
 }
+
+
+export type TToastInfo = {
+  'message': string,
+  'type': 'success' | 'error',
+}

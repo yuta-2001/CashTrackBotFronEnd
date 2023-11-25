@@ -27,7 +27,7 @@ export default function ListComponent() {
 
   return (
     <div
-      className="flex-1 overflow-y-auto p-4 w-full fixed top-20"
+      className="flex-1 overflow-y-auto p-4 w-full mt-20"
       style={{
         height: 'calc(100vh - 10rem)',
       }}

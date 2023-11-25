@@ -14,6 +14,7 @@ type CreateModalProps = {
 };
 
 export default function CreateModalComponent (props: CreateModalProps) {
+  const { onClose } = props;
 
   const opponents = useOpponents();
   const setOpponents = useOpponentsUpdate();
@@ -43,17 +44,17 @@ export default function CreateModalComponent (props: CreateModalProps) {
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
       <div style={{ maxHeight: '90%' }} className="bg-white w-11/12 max-w-6xl h-auto overflow-auto rounded shadow-lg p-6 relative">
         <button
-          onClick={() => onclose}
+          onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
         >
           ✖
         </button>
-        <h2 className="text-lg font-bold mb-4">編集</h2>
+        <h2 className="text-lg font-bold mb-4">作成</h2>
         <form onSubmit={handleSubmit(onSubmitCreate)}>
           {/* Name field */}
           <div className="mb-4">
             <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-              項目名
+              名前
             </label>
             <input
               id="name"
@@ -65,7 +66,7 @@ export default function CreateModalComponent (props: CreateModalProps) {
             {errors.name && <ValidationErrorText message={errors.name.message} />}
           </div>
           <div className="flex justify-center mt-4">
-            <button onClick={() => onclose} className="px-4 py-3 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
+            <button onClick={onClose} className="px-4 py-3 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
             <button type="submit" className="px-4 py-3 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">作成する</button>
           </div>
         </form>

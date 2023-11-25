@@ -7,7 +7,6 @@ import { useOpponents } from "@/app/_context/OpponentsProvider";
 import { useTransactions } from "@/app/_context/Transactions/TransactionsProvider";
 import { useSearchConditions } from "@/app/_context/SearchConditionsProvider";
 import { useSelectedTransactions, useSelectedTransactionsUpdate } from "@/app/_context/Transactions/SelectedTransactionsProvider";
-import { useLiff } from "@/app/_context/LiffProvider";
 
 export default function ResultListComponent() {
 
@@ -95,9 +94,9 @@ export default function ResultListComponent() {
 
   return (
     <div 
-      className="flex-1 overflow-y-auto px-4 h-1/2 w-full fixed top-40"
+      className="flex-1 overflow-y-auto px-4 w-full mt-40"
       style = {{
-        height: 'calc(100% - 15rem)',
+        height: 'calc(100vh - 15rem)',
       }}
     >
       {resultList}

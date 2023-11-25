@@ -6,7 +6,7 @@ import { useOpponents, useOpponentsUpdate } from '../_context/OpponentsProvider'
 import { useSearchConditionsUpdate } from '../_context/SearchConditionsProvider';
 import { TOpponent } from '../_libs/types';
 import ValidationErrorText from '../_components/common/ValidationErrorText';
-import { updateOpponent } from '../_libs/data';
+import { updateOpponent, storeOpponent } from '../_libs/data';
 import { useLiff } from '../_context/LiffProvider';
 import { deleteOpponent } from '../_libs/data';
 
@@ -65,7 +65,21 @@ export default function OpponentsPage() {
   , [targetEditOpponent, liff, opponents, setOpponents]);
 
 
-  const submitDeleteOpponent = useCallback(async (opponentId: number) => {
+  const onSubmitCreate = useCallback<SubmitHandler<FormData>>(async (data) => {
+    if (liff === null || opponents === undefined || setOpponents === undefined) {
+      return;
+    }
+
+    const createdOpponent = await storeOpponent(data, liff);
+
+    if (createdOpponent) {
+      setOpponents([createdOpponent, ...opponents]);
+      setIsCreateModalOpen(false);
+    }
+  }, [liff, opponents, setOpponents]);
+
+
+  const submitDeleteOpponent = useCallback(async (targetOpponent: TOpponent) => {
     if (liff === null || opponents === undefined || setOpponents === undefined) {
       return;
     }
@@ -75,10 +89,10 @@ export default function OpponentsPage() {
     }
 
     try {
-      await deleteOpponent(opponentId, liff);
+      await deleteOpponent(targetOpponent, liff);
       setTargetEditOpponent(null);
       setOpponents(opponents.filter((opponent) => {
-        return opponent.id !== opponentId;
+        return opponent.id !== targetOpponent.id;
       }));
     } catch (e) {
       alert('エラーが発生しました');
@@ -149,7 +163,7 @@ export default function OpponentsPage() {
                 <div className="flex justify-center mt-4">
                   <button onClick={() => setTargetEditOpponent(null)} className="px-3 py-3 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
                   <button type="submit" className="px-3 py-3 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">更新する</button>
-                  <button onClick={() => submitDeleteOpponent(targetEditOpponent.id)} className="px-3 py-3 ml-2 bg-red-500 text-white rounded shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-opacity-50 transition-colors">削除する</button>
+                  <button onClick={() => submitDeleteOpponent(targetEditOpponent)} className="px-3 py-3 ml-2 bg-red-500 text-white rounded shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-opacity-50 transition-colors">削除する</button>
                 </div>
               </form>
             </div>
@@ -160,11 +174,46 @@ export default function OpponentsPage() {
 
 
       <button
+        onClick={() => setIsCreateModalOpen(true)}
         className="fixed z-10 bottom-24 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600 text-white font-bold w-16 h-16 rounded-full leading-none text-3xl"
         aria-label="Add"
       >
       +
       </button>
+
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+          <div style={{ maxHeight: '90%' }} className="bg-white w-11/12 max-w-6xl h-auto overflow-auto rounded shadow-lg p-6 relative">
+            <button
+              onClick={() => setIsCreateModalOpen(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              ✖
+            </button>
+            <h2 className="text-lg font-bold mb-4">編集</h2>
+            <form onSubmit={handleSubmit(onSubmitCreate)}>
+              {/* Name field */}
+              <div className="mb-4">
+                <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
+                  項目名
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  className="mt-1 block w-full h-10 p-2 border border-gray-300 bg-white rounded shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="名前"
+                  {...register("name", { required: '名前は必須です' })} 
+                />
+                {errors.name && <ValidationErrorText message={errors.name.message} />}
+              </div>
+              <div className="flex justify-center mt-4">
+                <button onClick={() => setIsCreateModalOpen(false)} className="px-4 py-3 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
+                <button type="submit" className="px-4 py-3 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">作成する</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }

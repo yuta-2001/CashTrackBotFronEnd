@@ -73,6 +73,7 @@ export async function updateOpponent(opponentId: number, opponent: any, liff: Li
 
 
 export async function deleteOpponent(opponent: any, liff: Liff) {
+  console.log(opponent)
   const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);

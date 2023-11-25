@@ -16,7 +16,6 @@ export default function ResultListComponent() {
   const searchConditions = useSearchConditions();
   const selectedTransactions = useSelectedTransactions();
   const setSelectedTransactions = useSelectedTransactionsUpdate();
-  const liff = useLiff();
 
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
   const [results, setResults] = useState<TTransaction[]>([]);
@@ -24,36 +23,32 @@ export default function ResultListComponent() {
   useEffect(() => {
     if (
       transactions === undefined ||
-      searchConditions === undefined ||
-      liff === null
+      searchConditions === undefined
     ) {
       return;
     }
 
-    if (transactions) {
-      setResults(transactions.filter((transaction) => {
-        if (searchConditions.type !== 'all' && transaction.type !== Number(searchConditions.type)) {
-          return false;
-        }
+    setResults(transactions.filter((transaction) => {
+      if (searchConditions.type !== 'all' && transaction.type !== Number(searchConditions.type)) {
+        return false;
+      }
 
-        if (transaction.is_settled !== searchConditions.isSettled) {
-          return false;
-        }
+      if (transaction.is_settled !== searchConditions.isSettled) {
+        return false;
+      }
 
-        if (searchConditions.opponent !== 'all' && transaction.opponent_id !== Number(searchConditions.opponent)) {
-          return false;
-        }
+      if (searchConditions.opponent !== 'all' && transaction.opponent_id !== Number(searchConditions.opponent)) {
+        return false;
+      }
 
-        return true;
-      }));
-    }
-  }, [liff, searchConditions, transactions]);
+      return true;
+    }));
+  }, [searchConditions.isSettled, searchConditions.opponent, searchConditions.type, transactions]);
 
   const handleCheck = useCallback((transaction: TTransaction, isChecked: boolean) => {
     if (
       selectedTransactions === undefined ||
-      setSelectedTransactions === undefined ||
-      liff === null
+      setSelectedTransactions === undefined
     ) {
       return;
     }
@@ -63,7 +58,7 @@ export default function ResultListComponent() {
     } else {
       setSelectedTransactions(selectedTransactions.filter((exitTransaction) => exitTransaction.id !== transaction.id));
     }
-  }, [liff, selectedTransactions, setSelectedTransactions])
+  }, [selectedTransactions, setSelectedTransactions])
 
 
   const resultList = useMemo(() => {

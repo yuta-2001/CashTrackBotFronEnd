@@ -1,8 +1,9 @@
+import { Liff } from "@line/liff";
 import { TTransaction, TTransactionForm } from "./types";
 
 const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
 
-async function getAccessToken(liff: any) {
+async function getAccessToken(liff: Liff) {
   const accessToken = await liff.getAccessToken();
 
   if (!accessToken) {
@@ -12,7 +13,7 @@ async function getAccessToken(liff: any) {
   return accessToken;
 }
 
-export async function getOpponents(liff: any) {
+export async function getOpponents(liff: Liff) {
   const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
@@ -27,7 +28,7 @@ export async function getOpponents(liff: any) {
 }
 
 
-export async function getTransactions(liff: any) {
+export async function getTransactions(liff: Liff) {
   const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
@@ -42,7 +43,7 @@ export async function getTransactions(liff: any) {
 }
 
 
-export async function storeTransaction(transaction: any, liff: any) {
+export async function storeTransaction(transaction: any, liff: Liff) {
   const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
@@ -63,7 +64,7 @@ export async function storeTransaction(transaction: any, liff: any) {
 }
 
 
-export async function updateTransaction(transactionId: number, transaction: TTransactionForm, liff: any): Promise<TTransaction> {
+export async function updateTransaction(transactionId: number, transaction: TTransactionForm, liff: Liff): Promise<TTransaction> {
   const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
@@ -86,7 +87,7 @@ export async function updateTransaction(transactionId: number, transaction: TTra
 }
 
 
-export async function batchSettleTransaction(ids: Array<Number>, liff: any) {
+export async function batchSettleTransaction(ids: Array<Number>, liff: Liff) {
   const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
@@ -109,7 +110,7 @@ export async function batchSettleTransaction(ids: Array<Number>, liff: any) {
 }
 
 
-export async function deleteTransaction(transaction: TTransaction, liff: any) {
+export async function deleteTransaction(transaction: TTransaction, liff: Liff) {
   const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);
@@ -126,7 +127,7 @@ export async function deleteTransaction(transaction: TTransaction, liff: any) {
 }
 
 
-export async function batchDeleteTransaction(ids: Array<Number>, liff: any) {
+export async function batchDeleteTransaction(ids: Array<Number>, liff: Liff) {
   const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};
   const query = new URLSearchParams(params);

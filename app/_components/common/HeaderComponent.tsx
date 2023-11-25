@@ -1,11 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react'
 import { useLiff } from '../../_context/LiffProvider'
+import { TUser } from '../../_libs/types'
 
 const HeaderComponent = () => {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<TUser | null>(null);
   const liff = useLiff();
-  console.log('liff', liff);
 
   useEffect(() => {
     if (!liff) return;

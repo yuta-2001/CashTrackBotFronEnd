@@ -1,4 +1,5 @@
 'use client';
+import { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
 import ValidationErrorText from "../../common/ValidationErrorText";
@@ -20,10 +21,6 @@ const CreateModalComponent = (props: CreateModalProps) => {
 	const opponents = useOpponents();
 	const liff = useLiff();
 
-	if (transactions === undefined || setTransactions === undefined || opponents === undefined || liff === null) {
-		return;
-	}
-
 	const {
     register,
     handleSubmit,
@@ -31,6 +28,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 	} = useForm<TTransactionForm>();
 
 	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
+		if (liff === null || transactions === undefined || setTransactions === undefined) return;
 		try {
 				const createdTransaction = await storeTransaction(data, liff);
 				setTransactions([createdTransaction, ...transactions!]);
@@ -40,6 +38,12 @@ const CreateModalComponent = (props: CreateModalProps) => {
 
 		onClose();
 	}
+
+	useEffect(() => {
+		if (transactions === undefined || setTransactions === undefined || opponents === undefined || liff === null) {
+			return;
+		}
+	}, [transactions, setTransactions, opponents, liff]);
 
 	return (
 		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-20">

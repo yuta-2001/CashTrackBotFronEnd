@@ -1,16 +1,16 @@
 'use client'
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
-import liff from '@line/liff'
+import liff, { Liff } from '@line/liff'
 
 
 type LiffProviderProps = {
   children: ReactNode;
 };
 
-const LiffContext = createContext<any | null>(null)
+const LiffContext = createContext<Liff | null>(null)
 
 export const LiffProvider: React.FC<LiffProviderProps> = ({ children }) => {
-  const [liffObject, setLiffObject] = useState<any | null>(null)
+  const [liffObject, setLiffObject] = useState<Liff | null>(null)
 
   useEffect(() => {
     liff

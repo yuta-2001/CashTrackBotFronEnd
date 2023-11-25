@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect, useCallback, useMemo } from "react"
 import { TCalculateResult } from "@/app/_libs/types"
 import { TransactionType, CalculateTransactionType } from "@/app/_libs/enums"
 import SearchBoxModalComponent from "@/app/_components/Transactions/Modal/SearchBoxModalComponent"
@@ -23,17 +23,17 @@ export default function HeadBtnListComponent() {
   const searchConditions = useSearchConditions();
   const liff = useLiff();
 
-  if (selectedTransactions === undefined ||
-      setSelectedTransactions === undefined ||
+  const handleDeleteConfirm = useCallback(async () => {
+    if (
       transactions === undefined ||
       setTransactions === undefined ||
-      opponents === undefined ||
+      selectedTransactions === undefined ||
+      setSelectedTransactions === undefined ||
       liff === null
-  ) {
-    return;
-  }
+    ) {
+      return;
+    }
 
-  const handleDeleteConfirm = async () => {
     if (selectedTransactions.length === 0) {
       alert('削除する取引を選択してください');
       return;
@@ -58,9 +58,9 @@ export default function HeadBtnListComponent() {
     }));
 
     setSelectedTransactions([]);
-  };
+  }, [transactions, setTransactions, selectedTransactions, setSelectedTransactions, liff]);
 
-  const handleSettleConfirm = () => {
+  const handleSettleConfirm = useCallback(() => {
     if (transactions === null) {
       return;
     }
@@ -113,10 +113,23 @@ export default function HeadBtnListComponent() {
 
     setCalculateSettled(calculate);
     setIsOpenSettleConfirm(true);
-  }
+  }, [transactions, opponents, selectedTransactions, setCalculateSettled, setIsOpenSettleConfirm]);
 
-  return (
-    <div className="w-11/12 flex justify-between items-center mt-4 mx-auto relative">
+  useEffect(() => {
+    if (selectedTransactions === undefined ||
+      setSelectedTransactions === undefined ||
+      transactions === undefined ||
+      setTransactions === undefined ||
+      opponents === undefined ||
+      liff === null
+    ) {
+      return;
+    }
+  }, [selectedTransactions]);
+
+
+  const actionBtnList = useMemo(() => {
+    return (
       <div>
         {!searchConditions.isSettled && (
           selectedTransactions.length > 0 ? (
@@ -154,13 +167,24 @@ export default function HeadBtnListComponent() {
           )
         }
       </div>
-      {/* 条件変更ボタン */}
+    )
+  }, [searchConditions.isSettled, selectedTransactions, handleSettleConfirm, handleDeleteConfirm]);
+
+  const toggleSearchBoxBtn = useMemo(() => {
+    return (
       <button
         onClick={() => setIsSearchVisible(!isSearchVisible)}
         className="px-4 py-3 bg-green-500 text-white text-md font-semibold rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors"
       >
         {isSearchVisible ? '閉じる' : '絞り込み'}
       </button>
+    )
+  }, [isSearchVisible, setIsSearchVisible]);
+
+  return (
+    <div className="w-11/12 flex justify-between items-center mt-4 mx-auto relative">
+      {actionBtnList}
+      {toggleSearchBoxBtn}
 
       {isSearchVisible && (
         <SearchBoxModalComponent />

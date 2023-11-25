@@ -182,7 +182,7 @@ export default function HeadBtnListComponent() {
   }, [isSearchVisible, setIsSearchVisible]);
 
   return (
-    <div className="w-11/12 flex justify-between items-center mt-4 mx-auto relative">
+    <div className="w-full px-4 flex justify-between items-center mt-4 mx-auto fixed top-20 right-0 z-10">
       {actionBtnList}
       {toggleSearchBoxBtn}
 

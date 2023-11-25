@@ -22,7 +22,7 @@ const HeaderComponent = () => {
   }, [liff]);
 
   return (
-    <header className="shadow px-4 h-20 flex items-center bg-green-500 w-full">
+    <header className="shadow px-4 h-20 flex items-center bg-green-500 w-full fixed top-0 right-0">
       <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
         {
           user?.pictureUrl && (

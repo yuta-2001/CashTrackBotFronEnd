@@ -1,7 +1,9 @@
 'use client'
 import React, { createContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
-import { TTransaction } from '../_libs/types';
+import { TTransaction } from '../../_libs/types';
 import { useContext } from 'react';
+import { useLiff } from '../LiffProvider';
+import { getTransactions } from '../../_libs/data';
 
 type TransactionsUpdateType = Dispatch<SetStateAction<TTransaction[]>>;
 
@@ -14,10 +16,20 @@ type TransactionsProviderProps = {
 
 export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ children }) => {
   const [transactions, setTransactions] = useState<TTransaction[]>([]);
+  const liff = useLiff();
 
   useEffect(() => {
-    setTransactions([])
-  }, [])
+    if (liff === null) {
+      return;
+    }
+
+    const fetchData = async () => {
+      const transactionsData = await getTransactions(liff);
+      setTransactions(transactionsData);
+    }
+
+    fetchData();
+  }, [liff, getTransactions])
 
   return (
     <TransactionsContext.Provider value={transactions}>

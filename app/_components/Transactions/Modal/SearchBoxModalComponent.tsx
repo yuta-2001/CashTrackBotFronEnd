@@ -1,4 +1,4 @@
-import { useSearchConditions, useSearchConditionsUpdate } from "@/app/_context/Transactions/SearchConditionsProvider";
+import { useSearchConditions, useSearchConditionsUpdate } from "@/app/_context/SearchConditionsProvider";
 import { useOpponents } from "@/app/_context/OpponentsProvider";
 import { TTypeSelect, TOpponentSelect } from "@/app/_libs/types";
 

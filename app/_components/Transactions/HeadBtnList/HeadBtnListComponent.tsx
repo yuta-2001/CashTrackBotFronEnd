@@ -5,9 +5,9 @@ import SearchBoxModalComponent from "@/app/_components/Transactions/Modal/Search
 import SettleConfirmModalComponent from "@/app/_components/Transactions/Modal/SettleConfirmModalComponent"
 import { batchDeleteTransaction } from "@/app/_libs/data"
 import { useSelectedTransactions, useSelectedTransactionsUpdate } from "@/app/_context/Transactions/SelectedTransactionsProvider"
-import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider"
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/Transactions/TransactionsProvider"
 import { useOpponents } from "@/app/_context/OpponentsProvider"
-import { useSearchConditions } from "@/app/_context/Transactions/SearchConditionsProvider"
+import { useSearchConditions } from "@/app/_context/SearchConditionsProvider"
 import { useLiff } from "@/app/_context/LiffProvider"
 
 export default function HeadBtnListComponent() {
@@ -182,7 +182,7 @@ export default function HeadBtnListComponent() {
   }, [isSearchVisible, setIsSearchVisible]);
 
   return (
-    <div className="w-11/12 flex justify-between items-center mt-4 mx-auto relative">
+    <div className="w-full px-4 flex justify-between items-center mt-4 mx-auto fixed top-20 right-0">
       {actionBtnList}
       {toggleSearchBoxBtn}
 

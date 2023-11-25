@@ -5,7 +5,7 @@ import { TransactionType } from "@/app/_libs/enums";
 import ValidationErrorText from "../../common/ValidationErrorText";
 import { TTransactionForm } from "@/app/_libs/types";
 import { storeTransaction } from "@/app/_libs/data";
-import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/Transactions/TransactionsProvider";
 import { useOpponents } from "@/app/_context/OpponentsProvider";
 import { useLiff } from "@/app/_context/LiffProvider";
 

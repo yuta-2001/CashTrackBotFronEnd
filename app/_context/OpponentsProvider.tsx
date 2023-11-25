@@ -2,6 +2,8 @@
 import React, { createContext, useState, useEffect, ReactNode, Dispatch, SetStateAction, use } from 'react';
 import { TOpponent } from '../_libs/types';
 import { useContext } from 'react';
+import { getOpponents } from '../_libs/data';
+import { useLiff } from './LiffProvider';
 
 type OpponentsUpdateType = Dispatch<SetStateAction<TOpponent[]>>;
 
@@ -14,10 +16,20 @@ type OpponentsProviderProps = {
 
 export const OpponentsProvider: React.FC<OpponentsProviderProps> = ({ children }) => {
   const [opponents, setOpponents] = useState<TOpponent[]>([]);
+  const liff = useLiff();
 
   useEffect(() => {
-    setOpponents([])
-  }, [])
+    if (liff === null) {
+      return;
+    }
+
+    const fetchData = async () => {
+      const opponentsData = await getOpponents(liff);
+      setOpponents(opponentsData);
+    }
+
+    fetchData();
+  }, [liff, getOpponents])
 
   return (
     <OpponentsContext.Provider value={opponents}>

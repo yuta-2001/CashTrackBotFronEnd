@@ -5,7 +5,7 @@ import ValidationErrorText from "../../common/ValidationErrorText";
 import { TTransaction, TTransactionForm } from "@/app/_libs/types";
 import { updateTransaction } from "@/app/_libs/data";
 import { useLiff } from "@/app/_context/LiffProvider";
-import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
+import { useTransactions, useTransactionsUpdate } from "@/app/_context/Transactions/TransactionsProvider";
 import { useOpponents } from "@/app/_context/OpponentsProvider";
 import { useEffect, useCallback } from "react";
 
@@ -61,7 +61,7 @@ const EditModalComponent = (props: EditModalProps) => {
 	}, [opponents, setTransactions, liff]);
 
 	return (
-		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-20">
+		<div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
 			<div style={{ maxHeight: '90%' }} className="bg-white w-11/12 max-w-6xl h-auto overflow-auto rounded shadow-lg p-6 relative">
         <button
           onClick={onClose}

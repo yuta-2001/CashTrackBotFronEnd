@@ -28,6 +28,67 @@ export async function getOpponents(liff: Liff) {
 }
 
 
+export async function storeOpponent(opponent: any, liff: Liff) {
+  const accessToken = await getAccessToken(liff);
+  const params = {accessToken : accessToken};
+  const query = new URLSearchParams(params);
+  const response = await fetch(`${API_DOMAIN}/api/liff/opponents?${query}`, {
+    method: "POST",
+    body: JSON.stringify(opponent),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (response.status !== 200) {
+    throw new Error("API Error");
+  }
+
+  const createdOpponent = await response.json();
+  return createdOpponent.data;
+}
+
+
+export async function updateOpponent(opponentId: number, opponent: any, liff: Liff) {
+  const accessToken = await getAccessToken(liff);
+  const params = {accessToken : accessToken};
+  const query = new URLSearchParams(params);
+  const response = await fetch(`${API_DOMAIN}/api/liff/opponents/${opponentId}?${query}`, {
+    method: "PUT",
+    body: JSON.stringify(opponent),
+    cache: "no-cache",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    mode: 'cors'
+  });
+
+  if (response.status !== 200) {
+    throw new Error("API Error");
+  }
+
+  const updatedOpponent = await response.json();
+  return updatedOpponent.data;
+}
+
+
+export async function deleteOpponent(opponent: any, liff: Liff) {
+  const accessToken = await getAccessToken(liff);
+  const params = {accessToken : accessToken};
+  const query = new URLSearchParams(params);
+  const response = await fetch(`${API_DOMAIN}/api/liff/opponents/${opponent.id}?${query}`, {
+    method: "DELETE",
+  });
+
+  if (response.status !== 200) {
+    throw new Error("API Error");
+  }
+
+  const data = response.json();
+  return data;
+}
+
+
 export async function getTransactions(liff: Liff) {
   const accessToken = await getAccessToken(liff);
   const params = {accessToken : accessToken};

@@ -3,80 +3,51 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { TTransaction } from "@/app/_libs/types";
 import { TransactionType } from "@/app/_libs/enums";
 import EditModalComponent from "@/app/_components/Transactions/Modal/EditModalComponent";
-import { getOpponents, getTransactions } from '@/app/_libs/data';
-import { useOpponents, useOpponentsUpdate } from "@/app/_context/OpponentsProvider";
-import { useTransactions, useTransactionsUpdate } from "@/app/_context/TransactionsProvider";
-import { useSearchConditions } from "@/app/_context/Transactions/SearchConditionsProvider";
+import { useOpponents } from "@/app/_context/OpponentsProvider";
+import { useTransactions } from "@/app/_context/Transactions/TransactionsProvider";
+import { useSearchConditions } from "@/app/_context/SearchConditionsProvider";
 import { useSelectedTransactions, useSelectedTransactionsUpdate } from "@/app/_context/Transactions/SelectedTransactionsProvider";
-import { useLiff } from "@/app/_context/LiffProvider";
 
 export default function ResultListComponent() {
 
   const opponents = useOpponents();
-  const setOpponents = useOpponentsUpdate();
   const transactions = useTransactions();
-  const setTransactions = useTransactionsUpdate();
   const searchConditions = useSearchConditions();
   const selectedTransactions = useSelectedTransactions();
   const setSelectedTransactions = useSelectedTransactionsUpdate();
-  const liff = useLiff();
 
   const [targetEditTransaction, setTargetEditTransaction] = useState<TTransaction | null>(null);
   const [results, setResults] = useState<TTransaction[]>([]);
 
   useEffect(() => {
-    if (opponents === undefined ||
-        setOpponents === undefined ||
-        setTransactions === undefined ||
-        liff === null
-    ) {
-      return;
-    }
-
-    const fetchData = async () => {
-      const opponentsData = await getOpponents(liff);
-      const transactionsData = await getTransactions(liff);
-      
-      setOpponents(opponentsData);
-      setTransactions(transactionsData);
-    }
-
-    fetchData();
-  }, [liff, setOpponents, setTransactions]);
-
-  useEffect(() => {
     if (
       transactions === undefined ||
-      searchConditions === undefined ||
-      liff === null
+      searchConditions === undefined
     ) {
       return;
     }
 
-    if (transactions) {
-      setResults(transactions.filter((transaction) => {
-        if (searchConditions.type !== 'all' && transaction.type !== Number(searchConditions.type)) {
-          return false;
-        }
+    setResults(transactions.filter((transaction) => {
+      if (searchConditions.type !== 'all' && transaction.type !== Number(searchConditions.type)) {
+        return false;
+      }
 
-        if (transaction.is_settled !== searchConditions.isSettled) {
-          return false;
-        }
+      if (transaction.is_settled !== searchConditions.isSettled) {
+        return false;
+      }
 
-        if (searchConditions.opponent !== 'all' && transaction.opponent_id !== Number(searchConditions.opponent)) {
-          return false;
-        }
+      if (searchConditions.opponent !== 'all' && transaction.opponent_id !== Number(searchConditions.opponent)) {
+        return false;
+      }
 
-        return true;
-      }));
-    }
-  }, [liff, searchConditions, transactions]);
+      return true;
+    }));
+  }, [searchConditions.isSettled, searchConditions.opponent, searchConditions.type, transactions]);
 
   const handleCheck = useCallback((transaction: TTransaction, isChecked: boolean) => {
     if (
       selectedTransactions === undefined ||
-      setSelectedTransactions === undefined ||
-      liff === null
+      setSelectedTransactions === undefined
     ) {
       return;
     }
@@ -86,7 +57,7 @@ export default function ResultListComponent() {
     } else {
       setSelectedTransactions(selectedTransactions.filter((exitTransaction) => exitTransaction.id !== transaction.id));
     }
-  }, [liff, selectedTransactions, setSelectedTransactions])
+  }, [selectedTransactions, setSelectedTransactions])
 
 
   const resultList = useMemo(() => {
@@ -122,7 +93,12 @@ export default function ResultListComponent() {
 
 
   return (
-    <div className="flex-1 overflow-y-auto p-4">
+    <div 
+      className="flex-1 overflow-y-auto px-4 w-full mt-40"
+      style = {{
+        height: 'calc(100vh - 15rem)',
+      }}
+    >
       {resultList}
       {targetEditTransaction && (
         <EditModalComponent

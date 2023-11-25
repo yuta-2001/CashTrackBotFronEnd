@@ -35,7 +35,7 @@ export default function CreateModalComponent (props: CreateModalProps) {
 
     if (createdOpponent) {
       setOpponents([createdOpponent, ...opponents]);
-      onclose;
+      onClose();
     }
   }, [liff, opponents, setOpponents]);
 

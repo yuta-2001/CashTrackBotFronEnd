@@ -94,7 +94,7 @@ export default function ResultListComponent() {
 
   return (
     <div 
-      className="flex-1 overflow-y-auto px-4 w-full mt-40"
+      className="flex-1 overflow-y-auto px-4 w-full mt-4"
       style = {{
         height: 'calc(100vh - 15rem)',
       }}

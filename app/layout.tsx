@@ -3,6 +3,7 @@ import './globals.css';
 import { TransactionsProvider } from './_context/TransactionsProvider';
 import { OpponentsProvider } from './_context/OpponentsProvider';
 import HeaderComponent from './_components/common/HeaderComponent';
+import FooterComponent from './_components/common/FooterComponent';
 import { LiffProvider } from './_context/LiffProvider';
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({
             <body className="bg-gray-100">
               <HeaderComponent />
               {children}
+              <FooterComponent />
             </body>
           </html>
         </TransactionsProvider>

@@ -1,10 +1,11 @@
-import { useCallback } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useCallback, useEffect } from "react";
+import { useForm, SubmitHandler, set } from "react-hook-form";
 import { TOpponent } from "@/app/_libs/types";
 import { useOpponents, useOpponentsUpdate } from "@/app/_context/OpponentsProvider";
 import { useLiff } from "@/app/_context/LiffProvider";
 import { updateOpponent, deleteOpponent } from "@/app/_libs/data";
 import ValidationErrorText from "../../common/ValidationErrorText";
+import { useToastUpdate } from "@/app/_context/ToastProvider";
 
 
 type EditModalProps = {
@@ -22,6 +23,7 @@ export default function EditModalComponent(props: EditModalProps) {
   const liff = useLiff();
   const opponents = useOpponents();
   const setOpponents = useOpponentsUpdate();
+  const setToast = useToastUpdate();
 
   const {
     register,
@@ -48,25 +50,41 @@ export default function EditModalComponent(props: EditModalProps) {
 
 
   const submitDeleteOpponent = useCallback(async (targetOpponent: TOpponent) => {
-    if (liff === null || opponents === undefined || setOpponents === undefined) {
+    if (liff === null || opponents === undefined || setOpponents === undefined || setToast === undefined) {
       return;
     }
 
-    if (!confirm('選択した相手を削除しますか？削除した場合、相手に紐づいている取引も自動的に削除されます。')) {
+    if (!confirm('相手を削除しますか？削除した場合、相手に紐づいている取引も自動的に削除されます。')) {
       return;
     }
 
     try {
       await deleteOpponent(targetOpponent, liff);
-      onClose();
       setOpponents(opponents.filter((opponent) => {
         return opponent.id !== targetOpponent.id;
       }));
+      setToast({
+        type: 'success',
+        message: '相手を削除しました'
+      });
+      onClose();
     } catch (e) {
-      alert('エラーが発生しました');
+      liff.sendMessages([{
+        type: 'text',
+        text: 'エラーが発生しました。時間をおいて再度お試しください。'
+      }]).then(() => {
+        liff.closeWindow();
+      }).catch((error) => {
+        console.log(error);
+      });
     }
-  }, [liff, opponents, setOpponents]);
+  }, [liff, opponents, setOpponents, setToast]);
 
+  useEffect(() => {
+    if (opponents === undefined || setOpponents === undefined || liff === null) {
+      return;
+    }
+  }, [opponents, setOpponents, liff, setToast]);
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">

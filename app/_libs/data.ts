@@ -3,15 +3,37 @@ import { TTransaction, TTransactionForm } from "./types";
 
 const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
 
-async function getAccessToken(liff: Liff) {
+type AccessTokenCache = {
+  token: string | null;
+  timestamp: number | null;
+};
+
+let accessTokenCache: AccessTokenCache = {
+  token: null,
+  timestamp: null
+};
+
+async function getAccessToken(liff: Liff, cacheDuration = 300000) {
+  const currentTime = new Date().getTime();
+
+  if (accessTokenCache.token && accessTokenCache.timestamp && (currentTime - accessTokenCache.timestamp) < cacheDuration) {
+    return accessTokenCache.token;
+  }
+
   const accessToken = await liff.getAccessToken();
 
   if (!accessToken) {
     throw new Error("Access token not found");
   }
 
+  accessTokenCache = {
+    token: accessToken,
+    timestamp: currentTime
+  };
+
   return accessToken;
 }
+
 
 export async function getOpponents(liff: Liff) {
   const accessToken = await getAccessToken(liff);

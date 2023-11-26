@@ -8,6 +8,7 @@ import { useLiff } from "@/app/_context/LiffProvider";
 import { useTransactions, useTransactionsUpdate } from "@/app/_context/Transactions/TransactionsProvider";
 import { useOpponents } from "@/app/_context/OpponentsProvider";
 import { useEffect, useCallback } from "react";
+import { useToastUpdate } from "@/app/_context/ToastProvider";
 
 type EditModalProps = {
   transaction: TTransaction;
@@ -29,6 +30,7 @@ const EditModalComponent = (props: EditModalProps) => {
 	const transactions = useTransactions();
 	const setTransactions = useTransactionsUpdate();
 	const opponents = useOpponents();
+	const setToast = useToastUpdate();
 
 	const {
     register,
@@ -38,7 +40,7 @@ const EditModalComponent = (props: EditModalProps) => {
 
 	const onSubmit = useCallback<SubmitHandler<TTransactionForm>>(
 		async (data: TTransactionForm) => {
-			if (liff === null || transactions === undefined || setTransactions === undefined) return;
+			if (liff === null || transactions === undefined || setTransactions === undefined || setToast === undefined) return;
 	
 			try {
 				const updatedTransaction: TTransaction = await updateTransaction(transaction.id, data, liff);
@@ -46,14 +48,25 @@ const EditModalComponent = (props: EditModalProps) => {
 					setTransactions(transactions.map((transaction) => {
 						return transaction.id === updatedTransaction.id ? updatedTransaction : transaction;
 					}));
+					setToast({
+						type: 'success',
+						message: '記録を更新しました'
+					});
 				}
 			} catch (e) {
-				alert('エラーが発生しました');
+				liff.sendMessages([{
+					type: 'text',
+					text: 'エラーが発生しました。時間をおいて再度お試しください。'
+				}]).then(() => {
+					liff.closeWindow();
+				}).catch((error) => {
+					console.log(error);
+				});
 			}
-	
+
 			onClose();
 		},
-		[liff, transactions, setTransactions, onClose]
+		[liff, transactions, setTransactions, onClose, setToast]
 	);
 
 	useEffect(() => {

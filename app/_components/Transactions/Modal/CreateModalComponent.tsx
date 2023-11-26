@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TransactionType } from "@/app/_libs/enums";
 import ValidationErrorText from "../../common/ValidationErrorText";
@@ -8,6 +8,7 @@ import { storeTransaction } from "@/app/_libs/data";
 import { useTransactions, useTransactionsUpdate } from "@/app/_context/Transactions/TransactionsProvider";
 import { useOpponents } from "@/app/_context/OpponentsProvider";
 import { useLiff } from "@/app/_context/LiffProvider";
+import { useToastUpdate } from "@/app/_context/ToastProvider";
 
 type CreateModalProps = {
 	onClose: () => void;
@@ -20,6 +21,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 	const setTransactions = useTransactionsUpdate();
 	const opponents = useOpponents();
 	const liff = useLiff();
+	const setToast = useToastUpdate();
 
 	const {
     register,
@@ -27,17 +29,28 @@ const CreateModalComponent = (props: CreateModalProps) => {
     formState: { errors }
 	} = useForm<TTransactionForm>();
 
-	const onSubmit: SubmitHandler<TTransactionForm> = async (data: TTransactionForm) => {
-		if (liff === null || transactions === undefined || setTransactions === undefined) return;
+	const onSubmit: SubmitHandler<TTransactionForm> = useCallback(async (data: TTransactionForm) => {
+		if (liff === null || transactions === undefined || setTransactions === undefined || setToast === undefined) return;
 		try {
-				const createdTransaction = await storeTransaction(data, liff);
-				setTransactions([createdTransaction, ...transactions!]);
+			const createdTransaction = await storeTransaction(data, liff);
+			setTransactions([createdTransaction, ...transactions!]);
+			setToast({
+				type: 'success',
+				message: '記録を作成しました'
+			});
 		} catch (e) {
-				alert('エラーが発生しました');
+			liff.sendMessages([{
+				type: 'text',
+				text: 'エラーが発生しました。時間をおいて再度お試しください。'
+			}]).then(() => {
+				liff.closeWindow();
+			}).catch((error) => {
+				console.log(error);
+			});
 		}
 
 		onClose();
-	}
+	}, [liff, transactions, setTransactions, setToast]);
 
 	useEffect(() => {
 		if (transactions === undefined || setTransactions === undefined || opponents === undefined || liff === null) {

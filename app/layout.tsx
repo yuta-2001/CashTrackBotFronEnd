@@ -25,7 +25,7 @@ export default function RootLayout({
         <SearchConditionsProvider>
           <ToastProvider>
             <html lang="en">
-              <body className="bg-gray-100">
+              <body className="bg-gray-100 fixed h-full w-full top-0 right-0 bottom-0 left-0">
                 <HeaderComponent />
                 <ToastNotification />
                 {children}

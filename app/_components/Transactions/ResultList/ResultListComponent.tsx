@@ -70,6 +70,7 @@ export default function ResultListComponent() {
               type="checkbox"
               className="form-checkbox h-10 w-10 text-green-500 rounded focus:ring-0 focus:outline-none transition duration-150 ease-in-out"
               onChange={(e) => handleCheck(result, e.target.checked)}
+              checked={selectedTransactions?.find((transaction) => transaction.id === result.id) !== undefined}
             />
 
             <div className="flex-grow ml-4">
@@ -94,14 +95,14 @@ export default function ResultListComponent() {
         ))}
       </>
     )
-  }, [results, opponents, handleCheck]);
+  }, [results, opponents, handleCheck, selectedTransactions]);
 
 
   return (
     <div 
       className="flex-1 overflow-y-auto px-4 w-full mt-4"
       style = {{
-        height: 'calc(100vh - 15rem)',
+        height: 'calc(100vh - 18rem)',
       }}
     >
       {resultList}

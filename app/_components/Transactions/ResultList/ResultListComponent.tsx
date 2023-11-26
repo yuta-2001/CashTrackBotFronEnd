@@ -7,6 +7,7 @@ import { useOpponents } from "@/app/_context/OpponentsProvider";
 import { useTransactions } from "@/app/_context/Transactions/TransactionsProvider";
 import { useSearchConditions } from "@/app/_context/SearchConditionsProvider";
 import { useSelectedTransactions, useSelectedTransactionsUpdate } from "@/app/_context/Transactions/SelectedTransactionsProvider";
+import { Edit2 } from 'lucide-react';
 
 export default function ResultListComponent() {
 
@@ -81,7 +82,11 @@ export default function ResultListComponent() {
               <p className={`mr-4 text-lg font-bold ${result.type === TransactionType.Lend ? 'text-blue-500' : 'text-red-500'}`}>
                 {result.type === TransactionType.Lend ? '貸し' : '借り'}
               </p>
-              <button onClick={() => setTargetEditTransaction(result)} className="py-6 px-4 text-md font-bold text-gray-500 bg-gray-200 rounded hover:bg-gray-300">
+              <button
+                onClick={() => setTargetEditTransaction(result)}
+                className="py-6 w-24 text-md font-semibold text-blue-600 bg-blue-100 rounded hover:bg-blue-200 flex items-center justify-center"
+              >
+                <Edit2 className="w-5 h-5 mr-2" />
                 編集
               </button>
             </div>
@@ -94,7 +99,7 @@ export default function ResultListComponent() {
 
   return (
     <div 
-      className="flex-1 overflow-y-auto px-4 w-full mt-40"
+      className="flex-1 overflow-y-auto px-4 w-full mt-4"
       style = {{
         height: 'calc(100vh - 15rem)',
       }}

@@ -13,6 +13,17 @@ const config: Config = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      keyframes: {
+        flashFade: {
+          "0%": { transform: "translateX(calc(100% + 1rem))" },
+          "20%": { transform: "translateX(0)"},
+          "80%": { transform: "translateX(0)"},
+          "100%": { transform: "translateX(calc(100% + 1rem))" },
+        },
+      },
+      animation: {
+        flash: "flashFade 6.0s forwards",
+      },
     },
   },
   plugins: [],

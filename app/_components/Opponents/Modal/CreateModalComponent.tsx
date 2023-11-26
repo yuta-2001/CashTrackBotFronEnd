@@ -4,6 +4,7 @@ import { useOpponents, useOpponentsUpdate } from '../../../_context/OpponentsPro
 import { useLiff } from '../../../_context/LiffProvider';
 import { storeOpponent } from '../../../_libs/data';
 import ValidationErrorText from '../../common/ValidationErrorText';
+import { useToastUpdate } from '@/app/_context/ToastProvider';
 
 type FormData = {
   name: string;
@@ -19,6 +20,7 @@ export default function CreateModalComponent (props: CreateModalProps) {
   const opponents = useOpponents();
   const setOpponents = useOpponentsUpdate();
   const liff = useLiff();
+  const setToast = useToastUpdate();
 
   const {
     register,
@@ -27,7 +29,7 @@ export default function CreateModalComponent (props: CreateModalProps) {
 	} = useForm<FormData>();
 
   const onSubmitCreate = useCallback<SubmitHandler<FormData>>(async (data) => {
-    if (liff === null || opponents === undefined || setOpponents === undefined) {
+    if (liff === null || opponents === undefined || setOpponents === undefined || setToast === undefined) {
       return;
     }
 
@@ -35,7 +37,11 @@ export default function CreateModalComponent (props: CreateModalProps) {
 
     if (createdOpponent) {
       setOpponents([createdOpponent, ...opponents]);
-      onclose;
+      onClose();
+      setToast({
+        type: 'success',
+        message: '相手を新規作成しました',
+      });
     }
   }, [liff, opponents, setOpponents]);
 

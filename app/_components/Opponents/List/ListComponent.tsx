@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useSearchConditionsUpdate } from "@/app/_context/SearchConditionsProvider"
 import { TOpponent } from "@/app/_libs/types"
 import EditModalComponent from "../Modal/EditModalComponent"
+import { Edit2, CheckSquare } from 'lucide-react';
 
 export default function ListComponent() {
   const opponents = useOpponents()
@@ -34,28 +35,31 @@ export default function ListComponent() {
     >
       {opponents.map((opponent) => {
         return (
-          <div key={opponent.id} className="mb-4 p-4 bg-white rounded-lg shadow flex items-center justify-between">
-            <div className="flex-grow">
-              <h3 className="text-lg font-semibold text-gray-800">{opponent.name}</h3>
+          <div key={opponent.id} className="mb-4 p-4 bg-white rounded-lg shadow-md flex items-center justify-between">
+            <div>
+              <h3 className="text-md font-semibold text-gray-900">{opponent.name}</h3>
             </div>
 
             <div className="flex items-center">
               <button
                 onClick={() => checkTransaction(opponent.id)}
-                className="py-6 px-4 mr-2 text-md font-bold text-gray-500 bg-gray-200 rounded hover:bg-gray-300"
+                className="py-2 w-28 mr-2 text-xs font-semibold text-green-600 bg-green-100 rounded hover:bg-green-200 flex items-center justify-center"
               >
+                <CheckSquare className="w-5 h-5 mr-2" />
                 貸借り確認
               </button>
               <button
                 onClick={() => setTargetEditOpponent(opponent)}
-                className="py-6 px-4 text-md font-bold text-gray-500 bg-gray-200 rounded hover:bg-gray-300"
+                className="py-2 w-20 text-xs font-semibold text-blue-600 bg-blue-100 rounded hover:bg-blue-200 flex items-center justify-center"
               >
+                <Edit2 className="w-5 h-5 mr-2" />
                 編集
               </button>
             </div>
           </div>
         )
       })}
+
       {targetEditOpponent && (
         <EditModalComponent 
           targetOpponent={targetEditOpponent}

@@ -9,6 +9,7 @@ import { useTransactions, useTransactionsUpdate } from "@/app/_context/Transacti
 import { useOpponents } from "@/app/_context/OpponentsProvider"
 import { useSearchConditions } from "@/app/_context/SearchConditionsProvider"
 import { useLiff } from "@/app/_context/LiffProvider"
+import { useToastUpdate } from "@/app/_context/ToastProvider"
 
 export default function HeadBtnListComponent() {
   const [isOpenSettleConfirm, setIsOpenSettleConfirm] = useState<boolean>(false);
@@ -22,6 +23,7 @@ export default function HeadBtnListComponent() {
   const opponents = useOpponents();
   const searchConditions = useSearchConditions();
   const liff = useLiff();
+  const setToast = useToastUpdate();
 
   const handleDeleteConfirm = useCallback(async () => {
     if (
@@ -29,13 +31,17 @@ export default function HeadBtnListComponent() {
       setTransactions === undefined ||
       selectedTransactions === undefined ||
       setSelectedTransactions === undefined ||
-      liff === null
+      liff === null ||
+      setToast === undefined
     ) {
       return;
     }
 
     if (selectedTransactions.length === 0) {
-      alert('削除する取引を選択してください');
+      setToast({
+        type: 'error',
+        message: '削除する取引を選択してください'
+      });
       return;
     }
 
@@ -49,28 +55,38 @@ export default function HeadBtnListComponent() {
 
     try {
       await batchDeleteTransaction(transactionIds, liff);
+      setTransactions(transactions!.filter((transaction) => {
+        return !transactionIds.includes(transaction.id);
+      }));
+  
+      setSelectedTransactions([]);
+      setToast({
+        type: 'success',
+        message: '選択した記録を削除しました'
+      });
+
     } catch (e) {
       alert('エラーが発生しました');
     }
 
-    setTransactions(transactions!.filter((transaction) => {
-      return !transactionIds.includes(transaction.id);
-    }));
-
-    setSelectedTransactions([]);
   }, [transactions, setTransactions, selectedTransactions, setSelectedTransactions, liff]);
 
-  const handleSettleConfirm = useCallback(() => {
-    if (transactions === null) {
-      return;
-    }
 
-    if (opponents === null) {
+  const handleSettleConfirm = useCallback(() => {
+    if (
+      setToast === undefined ||
+      transactions === null ||
+      opponents === null ||
+      selectedTransactions === undefined
+    ) {
       return;
     }
 
     if (selectedTransactions.length === 0) {
-      alert('清算する取引を選択してください');
+      setToast({
+        type: 'error',
+        message: '清算する取引を選択してください'
+      });
       return;
     }
 
@@ -113,7 +129,8 @@ export default function HeadBtnListComponent() {
 
     setCalculateSettled(calculate);
     setIsOpenSettleConfirm(true);
-  }, [transactions, opponents, selectedTransactions, setCalculateSettled, setIsOpenSettleConfirm]);
+  }, [transactions, opponents, selectedTransactions, setCalculateSettled, setIsOpenSettleConfirm, setToast]);
+
 
   useEffect(() => {
     if (selectedTransactions === undefined ||
@@ -121,11 +138,12 @@ export default function HeadBtnListComponent() {
       transactions === undefined ||
       setTransactions === undefined ||
       opponents === undefined ||
-      liff === null
+      liff === null ||
+      setToast === undefined
     ) {
       return;
     }
-  }, [selectedTransactions]);
+  }, [selectedTransactions, setSelectedTransactions, transactions, setTransactions, opponents, liff, setToast]);
 
 
   const actionBtnList = useMemo(() => {

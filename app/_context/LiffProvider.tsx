@@ -22,7 +22,7 @@ export const LiffProvider: React.FC<LiffProviderProps> = ({ children }) => {
         }
       })
       .catch((err: any) => {
-        console.error({ err })
+        console.log(err)
       })
   }, [])
 

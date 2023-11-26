@@ -4,6 +4,8 @@ import { batchSettleTransaction } from '../../../_libs/data';
 import { useTransactions, useTransactionsUpdate } from '../../../_context/Transactions/TransactionsProvider';
 import { useSelectedTransactions, useSelectedTransactionsUpdate } from '../../../_context/Transactions/SelectedTransactionsProvider';
 import { useLiff } from '../../../_context/LiffProvider';
+import { useToastUpdate } from '@/app/_context/ToastProvider';
+import { useCallback, useEffect } from 'react';
 
 type SettleConfirmModalComponentProps = {
   setIsOpenSettleConfirm: (isOpen: boolean) => void;
@@ -27,40 +29,67 @@ const SettleConfirmModalComponent = (props: SettleConfirmModalComponentProps) =>
   const selectedTransactions = useSelectedTransactions();
   const setSelectedTransactions = useSelectedTransactionsUpdate();
   const liff = useLiff();
+  const setToast = useToastUpdate();
 
-  if (transactions === undefined ||
-      setTransactions === undefined ||
-      selectedTransactions === undefined ||
-      setSelectedTransactions === undefined ||
-      liff === null
-    ) {
-    return;
-  }
+  const onSubmit = useCallback(async () => {
+    if (transactions === undefined ||
+        setTransactions === undefined ||
+        selectedTransactions === undefined ||
+        setSelectedTransactions === undefined ||
+        liff === null ||
+        setToast === undefined
+      ) {
+      return;
+    }
 
-  const onSubmit = async () => {
     const transactionIds = selectedTransactions.map((settlement) => {
       return settlement.id;
     });
 
     try {
       await batchSettleTransaction(transactionIds, liff);
+
+      setTransactions(transactions!.map((transaction) => {
+        if (transactionIds.includes(transaction.id)) {
+          return {
+            ...transaction,
+            is_settled: true,
+          }
+        }
+        return transaction;
+      }));
+      setSelectedTransactions([]);
+      setToast({
+        type: 'success',
+        message: '選択した記録を清算済みにしました'
+      });
     } catch (e) {
-      alert('エラーが発生しました');
+      liff.sendMessages([{
+        type: 'text',
+        text: 'エラーが発生しました。時間をおいて再度お試しください。'
+      }]).then(() => {
+        liff.closeWindow();
+      }).catch((error) => {
+        console.log(error);
+      });
     }
 
-    setTransactions(transactions!.map((transaction) => {
-      if (transactionIds.includes(transaction.id)) {
-        return {
-          ...transaction,
-          is_settled: true,
-        }
-      }
-      return transaction;
-    }));
-
-    setSelectedTransactions([]);
     onClose();
-  }
+  }, [transactions, setTransactions, selectedTransactions, setSelectedTransactions, liff, setToast, onClose])
+
+
+  useEffect(() => {
+    if (transactions === undefined ||
+        setTransactions === undefined ||
+        selectedTransactions === undefined ||
+        setSelectedTransactions === undefined ||
+        liff === null ||
+        setToast === undefined
+      ) {
+      return;
+    }
+  }, [transactions, setTransactions, selectedTransactions, setSelectedTransactions, liff, setToast, onClose]);
+
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-20">

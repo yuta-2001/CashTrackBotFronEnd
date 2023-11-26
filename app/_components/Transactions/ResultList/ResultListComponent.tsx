@@ -62,6 +62,22 @@ export default function ResultListComponent() {
 
 
   const resultList = useMemo(() => {
+    if (
+      results === undefined ||
+      opponents === undefined ||
+      selectedTransactions === undefined
+    ) {
+      return;
+    }
+
+    if (results.length === 0) {
+      return (
+        <div className="flex justify-center mt-10">
+          <p className="text-gray-600">該当する貸借り記録はありません</p>
+        </div>
+      )
+    }
+
     return (
       <>
         {results.map((result) => (

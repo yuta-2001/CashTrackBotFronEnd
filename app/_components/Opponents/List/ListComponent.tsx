@@ -30,7 +30,7 @@ export default function ListComponent() {
     <div
       className="flex-1 overflow-y-auto p-4 w-full mt-20"
       style={{
-        height: 'calc(100vh - 10rem)',
+        height: 'calc(100vh - 15rem)',
       }}
     >
       {opponents.map((opponent) => {

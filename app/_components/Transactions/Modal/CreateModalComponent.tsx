@@ -165,7 +165,7 @@ const CreateModalComponent = (props: CreateModalProps) => {
 					</div>
 
 					<div className="flex justify-center mt-4">
-						<button onClick={onClose} className="px-5 py-3 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
+						<button type="button" onClick={onClose} className="px-5 py-3 mr-2 bg-gray-300 rounded shadow hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors">キャンセル</button>
 						<button type="submit" className="px-5 py-3 bg-green-500 text-white rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 transition-colors">作成する</button>
 					</div>
 				</form>

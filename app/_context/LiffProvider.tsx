@@ -25,13 +25,6 @@ export const LiffProvider: React.FC<LiffProviderProps> = ({ children }) => {
         // if (!liff.isLoggedIn()) {
         //   liff.login()
         // }
-
-        if (!liff.isInClient()) {
-          alert('LINEアプリで開いてください')
-          setLiffObject(null)
-          liff.closeWindow()
-          return
-        }
       })
       .then(() => {
         if (searchParams.get('page') === 'transactions') {
@@ -41,6 +34,13 @@ export const LiffProvider: React.FC<LiffProviderProps> = ({ children }) => {
         } else {
           setLiffObject(null)
           liff.closeWindow()
+        }
+      }).then(() => {
+        if (!liff.isInClient()) {
+          alert('LINEアプリで開いてください')
+          setLiffObject(null)
+          liff.closeWindow()
+          return
         }
       })
       .catch((err: any) => {

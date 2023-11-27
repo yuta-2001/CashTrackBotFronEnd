@@ -17,6 +17,8 @@ export const LiffProvider: React.FC<LiffProviderProps> = ({ children }) => {
       .init({ liffId: process.env.NEXT_PUBLIC_LIFF_ID! })
       .then(() => {
         setLiffObject(liff)
+
+        // ブラウザでのテストのみ
         if (!liff.isLoggedIn()) {
           liff.login()
         }

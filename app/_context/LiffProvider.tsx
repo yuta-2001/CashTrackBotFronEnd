@@ -19,8 +19,15 @@ export const LiffProvider: React.FC<LiffProviderProps> = ({ children }) => {
         setLiffObject(liff)
 
         // ブラウザでのテストのみ
-        if (!liff.isLoggedIn()) {
-          liff.login()
+        // if (!liff.isLoggedIn()) {
+        //   liff.login()
+        // }
+
+        if (!liff.isInClient()) {
+          alert('LINEアプリで開いてください')
+          setLiffObject(null)
+          liff.closeWindow()
+          return
         }
       })
       .catch((err: any) => {

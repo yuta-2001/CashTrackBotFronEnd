@@ -1,5 +1,6 @@
 'use client'
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
+import { useSearchParams, useRouter } from "next/navigation";
 import liff, { Liff } from '@line/liff'
 
 
@@ -11,6 +12,8 @@ const LiffContext = createContext<Liff | null>(null)
 
 export const LiffProvider: React.FC<LiffProviderProps> = ({ children }) => {
   const [liffObject, setLiffObject] = useState<Liff | null>(null)
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     liff
@@ -28,6 +31,16 @@ export const LiffProvider: React.FC<LiffProviderProps> = ({ children }) => {
           setLiffObject(null)
           liff.closeWindow()
           return
+        }
+      })
+      .then(() => {
+        if (searchParams.get('page') === 'transactions') {
+          router.push('/transactions')
+        } else if (searchParams.get('page') === 'opponents') {
+          router.push('/opponents')
+        } else {
+          setLiffObject(null)
+          liff.closeWindow()
         }
       })
       .catch((err: any) => {

@@ -7,6 +7,7 @@ import { LiffProvider } from './_context/LiffProvider';
 import { SearchConditionsProvider } from './_context/SearchConditionsProvider';
 import { ToastProvider } from './_context/ToastProvider';
 import ToastNotification from './_components/common/ToastNotification';
+import { TransactionsProvider } from './_context/Transactions/TransactionsProvider';
 
 export const metadata: Metadata = {
   title: 'お金貸し借り管理アプリ',
@@ -22,18 +23,20 @@ export default function RootLayout({
   return (
     <LiffProvider>
       <OpponentsProvider>
-        <SearchConditionsProvider>
-          <ToastProvider>
-            <html lang="en">
-              <body className="bg-gray-100 fixed h-full w-full top-0 right-0 bottom-0 left-0">
-                <HeaderComponent />
-                <ToastNotification />
-                {children}
-                <FooterComponent />
-              </body>
-            </html>
-          </ToastProvider>
-        </SearchConditionsProvider>
+        <TransactionsProvider>
+          <SearchConditionsProvider>
+            <ToastProvider>
+              <html lang="en">
+                <body className="bg-gray-100 fixed h-full w-full top-0 right-0 bottom-0 left-0">
+                  <HeaderComponent />
+                    <ToastNotification />
+                      {children}
+                    <FooterComponent />
+                </body>
+              </html>
+            </ToastProvider>
+          </SearchConditionsProvider>
+        </TransactionsProvider>
       </OpponentsProvider>
     </LiffProvider>
   )

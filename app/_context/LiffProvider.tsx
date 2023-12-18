@@ -1,8 +1,6 @@
 'use client'
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
-import { useSearchParams, useRouter } from "next/navigation";
 import liff, { Liff } from '@line/liff'
-
 
 type LiffProviderProps = {
   children: ReactNode;
@@ -12,29 +10,16 @@ const LiffContext = createContext<Liff | null>(null)
 
 export const LiffProvider: React.FC<LiffProviderProps> = ({ children }) => {
   const [liffObject, setLiffObject] = useState<Liff | null>(null)
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     liff
       .init({ liffId: process.env.NEXT_PUBLIC_LIFF_ID! })
       .then(() => {
         setLiffObject(liff)
-
         // ブラウザでのテストのみ
         // if (!liff.isLoggedIn()) {
         //   liff.login()
         // }
-      })
-      .then(() => {
-        if (searchParams.get('page') === 'transactions') {
-          router.push('/transactions')
-        } else if (searchParams.get('page') === 'opponents') {
-          router.push('/opponents')
-        } else {
-          setLiffObject(null)
-          liff.closeWindow()
-        }
       }).then(() => {
         if (!liff.isInClient()) {
           alert('LINEアプリで開いてください')

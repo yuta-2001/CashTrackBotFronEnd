@@ -1,20 +1,97 @@
 'use client';
 import { useState } from "react";
 import { useEffect } from "react";
+import { useLiff } from "../_context/LiffProvider";
 import { useOpponents } from "../_context/OpponentsProvider";
 import { useTransactions } from "../_context/Transactions/TransactionsProvider";
+import { generateTransactionsBill } from "../_libs/data";
+import { TBillInfo } from "../_libs/types";
+import { TransactionType } from "../_libs/enums";
 
 
 export default function BillPage() {
 
   const opponents = useOpponents();
   const transactions = useTransactions();
+  const liff = useLiff();
+
+  const [selectedOpponent, setSelectedOpponent] = useState<number | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (opponents === undefined || transactions === undefined) {
+    if (opponents === undefined || transactions === undefined || liff === null) {
       return;
     }
-  }, [opponents, transactions]);
+  }, [opponents, transactions, liff]);
+
+
+  const handleSelectOpponent = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (opponents === undefined || liff === null) {
+      return;
+    }
+
+    const opponentId = e.target.value;
+    if (opponentId === '') {
+      setSelectedOpponent(null);
+      setPreviewImage(null);
+      return;
+    }
+    setSelectedOpponent(Number(opponentId));
+
+    const calculatedAmount = culculateAmount(Number(opponentId));
+    if (calculatedAmount === null) {
+      alert('相手との取引がありません');
+      return;
+    } else if (calculatedAmount.amount < 0) {
+      alert('相手に返金する金額が残っています');
+      return;
+    }
+
+    const billInfo: TBillInfo = {
+      opponent_id: Number(opponentId),
+      opponent_name: opponents.find((opponent) => opponent.id === Number(opponentId))?.name!,
+      amount: calculatedAmount.amount!,
+      borrow_amount: calculatedAmount.borrowAmount!,
+      lend_amount: calculatedAmount.lendAmount!,
+    }
+
+    const previewUrl = await generateTransactionsBill(billInfo, liff)
+    setPreviewImage(previewUrl);
+  }
+
+
+  const culculateAmount = (opponentId: number) => {
+    if (transactions === undefined) {
+      return null;
+    }
+
+    const filteredTransactions = transactions.filter((transaction) => transaction.opponent_id === opponentId && !transaction.is_settled);
+    if (filteredTransactions.length === 0) {
+      return null;
+    }
+
+    // 相手がuserに対して借りている金額の計算
+    const borrowAmount = filteredTransactions.reduce((prev, current) => {
+      if (current.type === TransactionType.Lend) {
+        return prev + current.amount;
+      }
+      return prev;
+    }, 0);
+
+    // 相手がuserに対して貸している金額の計算
+    const lendAmount = filteredTransactions.reduce((prev, current) => {
+      if (current.type === TransactionType.Borrow) {
+        return prev + current.amount;
+      }
+      return prev;
+    }, 0);
+
+    return {
+      amount: borrowAmount - lendAmount,
+      borrowAmount,
+      lendAmount,
+    }
+  }
 
   return (
     <div
@@ -35,6 +112,7 @@ export default function BillPage() {
         <label htmlFor="recipient-select" className="block text-md font-medium text-gray-700">相手の選択</label>
         <select
           id="recipient-select"
+          onChange={handleSelectOpponent}
           className="mt-1 block w-full pl-3 h-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-md rounded-md"
         >
           <option value=''>相手を選択してください</option>
@@ -48,15 +126,13 @@ export default function BillPage() {
         </select>
       </div>
 
-      {/* プレビュー画像表示エリア */}
       <div className="mb-4">
         <p className="text-sm font-medium text-gray-700 mb-2">プレビュー:</p>
         <div className="border border-gray-300 rounded-md p-3">
-          <img src="/template.png" />
+          {previewImage === null ? <img src="/template.png" /> : <img src={previewImage} />}
         </div>
       </div>
 
-      {/* 発行ボタン */}
       <div>
         <button
           type="button"

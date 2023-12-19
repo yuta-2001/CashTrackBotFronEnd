@@ -1,5 +1,5 @@
 import { Liff } from "@line/liff";
-import { TTransaction, TTransactionForm } from "./types";
+import { TTransaction, TTransactionForm, TBillInfo } from "./types";
 
 const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
 
@@ -229,4 +229,26 @@ export async function batchDeleteTransaction(ids: Array<Number>, liff: Liff) {
 
   const data = response.json();
   return data;
+}
+
+
+export async function generateTransactionsBill(billInfo: TBillInfo, liff: Liff): Promise<string> {
+  const accessToken = await getAccessToken(liff);
+  const params = {accessToken : accessToken};
+  const query = new URLSearchParams(params);
+  const response = await fetch(`${API_DOMAIN}/api/liff/transactions/generate-bill?${query}`, {
+    method: "POST",
+    body: JSON.stringify(billInfo),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    mode: 'cors',
+  });
+
+  if (response.status !== 200) {
+    throw new Error("API Error");
+  }
+
+  const generateTransactionsBill = await response.json();
+  return generateTransactionsBill.data.url;
 }

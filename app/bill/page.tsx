@@ -42,15 +42,15 @@ export default function BillPage() {
     if (calculatedAmount === null) {
       alert('相手との取引がありません');
       return;
-    } else if (calculatedAmount.amount < 0) {
-      alert('相手に返金する金額が残っています');
+    } else if (calculatedAmount.amount <= 0) {
+      alert('精算額が0を下回っているため請求書を発行できません。');
       return;
     }
 
     const billInfo: TBillInfo = {
       opponent_id: Number(opponentId),
       opponent_name: opponents.find((opponent) => opponent.id === Number(opponentId))?.name!,
-      amount: calculatedAmount.amount!,
+      total_amount: calculatedAmount.amount!,
       borrow_amount: calculatedAmount.borrowAmount!,
       lend_amount: calculatedAmount.lendAmount!,
     }
@@ -91,6 +91,53 @@ export default function BillPage() {
       borrowAmount,
       lendAmount,
     }
+  }
+
+  const encodeJapanese = (str: string) => {
+    // 日本語にマッチする正規表現
+    const japaneseRegex = /[\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF\u4E00-\u9FAF\u3400-\u4DBF]/g;
+
+    // 日本語の部分を検出してエンコード
+    return str.replace(japaneseRegex, match => encodeURIComponent(match));
+  }
+
+  const sendBillToFriend = () => {
+    if (liff === null || previewImage === null) {
+      return;
+    }
+
+    const sendImageUrl = encodeJapanese(previewImage);
+
+    // alert(sendImageUrl)
+
+    liff
+      .shareTargetPicker(
+        [
+          {
+            type: "text",
+            text: "お金貸し借り管理BOTからの請求書です。\n精算額を確認し、速やかな対応をお願いします。",
+          },
+          {
+            type: "text",
+            text: "請求書の詳細に関しましてはご本人様にご確認ください。",
+          },
+          {
+            type: "image",
+            originalContentUrl: sendImageUrl,
+            previewImageUrl: sendImageUrl,
+          },
+        ],
+        {
+          isMultiple: false,
+        }
+      )
+      .then(() => {
+        alert('請求書を友達に送信しました。');
+      })
+      .catch((err) => {
+        alert(err);
+        alert('請求書の送信に失敗しました。');
+      })
   }
 
   return (
@@ -136,6 +183,7 @@ export default function BillPage() {
       <div>
         <button
           type="button"
+          onClick={sendBillToFriend}
           className="w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2"
         >
           友達に送付する

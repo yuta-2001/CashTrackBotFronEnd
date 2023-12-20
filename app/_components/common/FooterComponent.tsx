@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useCallback } from 'react';
-import { Users, CreditCard, MessageSquare } from 'lucide-react'; 
+import { Users, CreditCard, MessageSquare, Receipt } from 'lucide-react'; 
 import { useLiff } from '@/app/_context/LiffProvider';
 
 export default function FooterComponent () {
@@ -20,7 +20,7 @@ export default function FooterComponent () {
       <div className="flex w-full items-center">
         <Link
           href="/transactions"
-          className="w-1/3 text-center h-20 flex justify-center items-center"
+          className="w-1/4 text-center h-20 flex justify-center items-center"
         >
           <div>
             <CreditCard className="mx-auto w-10 h-10" />
@@ -31,7 +31,7 @@ export default function FooterComponent () {
         </Link>
         <Link
           href="/opponents"
-          className="w-1/3 text-center h-20 flex justify-center items-center"
+          className="w-1/4 text-center h-20 flex justify-center items-center"
         >
           <div>
             <Users className="mx-auto w-10 h-10" />
@@ -40,9 +40,20 @@ export default function FooterComponent () {
             </span>
           </div>
         </Link>
+        <Link
+          href="/bill"
+          className="w-1/4 text-center h-20 flex justify-center items-center"
+        >
+          <div>
+            <Receipt className="mx-auto w-10 h-10" />
+            <span className="text-xs font-bold">
+              請求書発行
+            </span>
+          </div>
+        </Link>
         <button
           onClick={closeApp}
-          className="w-1/3 text-center h-20 flex justify-center items-center"
+          className="w-1/4 text-center h-20 flex justify-center items-center"
         >
           <div>
             <MessageSquare className="mx-auto w-10 h-10" />

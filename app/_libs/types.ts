@@ -50,3 +50,11 @@ export type TToastInfo = {
   'message': string,
   'type': 'success' | 'error',
 }
+
+export type TBillInfo = {
+  'opponent_id': number,
+  'opponent_name': string,
+  'total_amount': number,
+  'borrow_amount': number,
+  'lend_amount': number,
+}

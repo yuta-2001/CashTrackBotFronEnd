@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useForm, SubmitHandler, set } from "react-hook-form";
 import { TOpponent } from "@/app/_libs/types";
+import { useTransactionsUpdate } from "@/app/_context/Transactions/TransactionsProvider";
 import { useOpponents, useOpponentsUpdate } from "@/app/_context/OpponentsProvider";
 import { useLiff } from "@/app/_context/LiffProvider";
 import { updateOpponent, deleteOpponent } from "@/app/_libs/data";
@@ -23,6 +24,7 @@ export default function EditModalComponent(props: EditModalProps) {
   const liff = useLiff();
   const opponents = useOpponents();
   const setOpponents = useOpponentsUpdate();
+  const setTransactions = useTransactionsUpdate();
   const setToast = useToastUpdate();
 
   const {
@@ -50,7 +52,7 @@ export default function EditModalComponent(props: EditModalProps) {
 
 
   const submitDeleteOpponent = useCallback(async (targetOpponent: TOpponent) => {
-    if (liff === null || opponents === undefined || setOpponents === undefined || setToast === undefined) {
+    if (liff === null || opponents === undefined || setOpponents === undefined || setToast === undefined || targetOpponent === null || setTransactions === undefined) {
       return;
     }
 
@@ -63,6 +65,14 @@ export default function EditModalComponent(props: EditModalProps) {
       setOpponents(opponents.filter((opponent) => {
         return opponent.id !== targetOpponent.id;
       }));
+
+      // 相手に紐づいている取引も削除する
+      setTransactions((transactions) => {
+        return transactions.filter((transaction) => {
+          return transaction.opponent_id !== targetOpponent.id;
+        });
+      });
+
       setToast({
         type: 'success',
         message: '相手を削除しました'

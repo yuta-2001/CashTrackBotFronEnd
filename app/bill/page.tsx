@@ -1,6 +1,5 @@
 'use client';
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useLiff } from "../_context/LiffProvider";
 import { useOpponents } from "../_context/OpponentsProvider";
 import { useTransactions } from "../_context/Transactions/TransactionsProvider";
@@ -60,7 +59,7 @@ export default function BillPage() {
   }
 
 
-  const culculateAmount = (opponentId: number) => {
+  const culculateAmount = useCallback((opponentId: number) => {
     if (transactions === undefined) {
       return null;
     }
@@ -91,19 +90,20 @@ export default function BillPage() {
       borrowAmount,
       lendAmount,
     }
-  }
+  }, [transactions])
 
-  const encodeJapanese = (str: string) => {
-    // 日本語にマッチする正規表現
-    const japaneseRegex = /[\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF\u4E00-\u9FAF\u3400-\u4DBF]/g;
-
-    // 日本語の部分を検出してエンコード
-    return str.replace(japaneseRegex, match => encodeURIComponent(match));
-  }
 
   const sendBillToFriend = () => {
     if (liff === null || previewImage === null) {
       return;
+    }
+
+    const encodeJapanese = (str: string) => {
+      // 日本語にマッチする正規表現
+      const japaneseRegex = /[\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF\u4E00-\u9FAF\u3400-\u4DBF]/g;
+  
+      // 日本語の部分を検出してエンコード
+      return str.replace(japaneseRegex, match => encodeURIComponent(match));
     }
 
     const sendImageUrl = encodeJapanese(previewImage);
@@ -140,6 +140,18 @@ export default function BillPage() {
       })
   }
 
+
+  const previewBillImageBlock = useMemo(() => {
+    return (
+      <div className="mb-4">
+        <p className="text-sm font-medium text-gray-700 mb-2">プレビュー:</p>
+        <div className="border border-gray-300 rounded-md p-3">
+          {previewImage === null ? <img src="/template.png" /> : <img src={previewImage} />}
+        </div>
+      </div>
+    )
+  }, [previewImage])
+
   return (
     <div
       className="flex-1 overflow-y-auto p-4 w-full mt-20"
@@ -173,12 +185,7 @@ export default function BillPage() {
         </select>
       </div>
 
-      <div className="mb-4">
-        <p className="text-sm font-medium text-gray-700 mb-2">プレビュー:</p>
-        <div className="border border-gray-300 rounded-md p-3">
-          {previewImage === null ? <img src="/template.png" /> : <img src={previewImage} />}
-        </div>
-      </div>
+      {previewBillImageBlock}
 
       <div>
         <button

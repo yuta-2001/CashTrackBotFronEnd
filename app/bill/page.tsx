@@ -37,7 +37,41 @@ export default function BillPage() {
     }
     setSelectedOpponent(Number(opponentId));
 
+    const culculateAmount = ((opponentId: number) => {
+      if (transactions === undefined) {
+        return null;
+      }
+  
+      const filteredTransactions = transactions.filter((transaction) => transaction.opponent_id === opponentId && !transaction.is_settled);
+      if (filteredTransactions.length === 0) {
+        return null;
+      }
+  
+      // 相手がuserに対して借りている金額の計算
+      const borrowAmount = filteredTransactions.reduce((prev, current) => {
+        if (current.type === TransactionType.Lend) {
+          return prev + current.amount;
+        }
+        return prev;
+      }, 0);
+  
+      // 相手がuserに対して貸している金額の計算
+      const lendAmount = filteredTransactions.reduce((prev, current) => {
+        if (current.type === TransactionType.Borrow) {
+          return prev + current.amount;
+        }
+        return prev;
+      }, 0);
+  
+      return {
+        amount: borrowAmount - lendAmount,
+        borrowAmount,
+        lendAmount,
+      }
+    });
+
     const calculatedAmount = culculateAmount(Number(opponentId));
+
     if (calculatedAmount === null) {
       alert('相手との取引がありません');
       return;
@@ -57,40 +91,6 @@ export default function BillPage() {
     const previewUrl = await generateTransactionsBill(billInfo, liff)
     setPreviewImage(previewUrl);
   }
-
-
-  const culculateAmount = useCallback((opponentId: number) => {
-    if (transactions === undefined) {
-      return null;
-    }
-
-    const filteredTransactions = transactions.filter((transaction) => transaction.opponent_id === opponentId && !transaction.is_settled);
-    if (filteredTransactions.length === 0) {
-      return null;
-    }
-
-    // 相手がuserに対して借りている金額の計算
-    const borrowAmount = filteredTransactions.reduce((prev, current) => {
-      if (current.type === TransactionType.Lend) {
-        return prev + current.amount;
-      }
-      return prev;
-    }, 0);
-
-    // 相手がuserに対して貸している金額の計算
-    const lendAmount = filteredTransactions.reduce((prev, current) => {
-      if (current.type === TransactionType.Borrow) {
-        return prev + current.amount;
-      }
-      return prev;
-    }, 0);
-
-    return {
-      amount: borrowAmount - lendAmount,
-      borrowAmount,
-      lendAmount,
-    }
-  }, [transactions])
 
 
   const sendBillToFriend = () => {

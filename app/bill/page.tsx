@@ -6,13 +6,14 @@ import { useTransactions } from "../_context/Transactions/TransactionsProvider";
 import { generateTransactionsBill } from "../_libs/data";
 import { TBillInfo } from "../_libs/types";
 import { TransactionType } from "../_libs/enums";
-
+import { useToastUpdate } from "../_context/ToastProvider";
 
 export default function BillPage() {
 
   const opponents = useOpponents();
   const transactions = useTransactions();
   const liff = useLiff();
+  const setToast = useToastUpdate();
 
   const [selectedOpponent, setSelectedOpponent] = useState<number | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -94,7 +95,7 @@ export default function BillPage() {
 
 
   const sendBillToFriend = () => {
-    if (liff === null || previewImage === null) {
+    if (liff === null || previewImage === null || setToast === undefined) {
       return;
     }
 
@@ -107,8 +108,6 @@ export default function BillPage() {
     }
 
     const sendImageUrl = encodeJapanese(previewImage);
-
-    // alert(sendImageUrl)
 
     liff
       .shareTargetPicker(
@@ -131,12 +130,25 @@ export default function BillPage() {
           isMultiple: false,
         }
       )
-      .then(() => {
-        alert('請求書を友達に送信しました。');
+      .then((res) => {
+        if (res) {
+          // succeeded in sending a message through TargetPicker
+          console.log(`[${res.status}] Message sent!`);
+          setToast({
+            type: 'success',
+            message: '請求書を送信しました。',
+          });
+        } else {
+          // sending message canceled
+          console.log("TargetPicker was closed!");
+        }
       })
       .catch((err) => {
         alert(err);
-        alert('請求書の送信に失敗しました。');
+        setToast({
+          type: 'error',
+          message: '請求書の送信に失敗しました。',
+        });
       })
   }
 
@@ -188,13 +200,25 @@ export default function BillPage() {
       {previewBillImageBlock}
 
       <div>
-        <button
-          type="button"
-          onClick={sendBillToFriend}
-          className="w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2"
-        >
-          友達に送付する
-        </button>
+        {
+          previewImage !== null && selectedOpponent !== null ? (
+            <button
+              type="button"
+              onClick={sendBillToFriend}
+              className="w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2"
+            >
+              友達に送付する
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-300 cursor-not-allowed"
+              disabled
+            >
+              友達に送付する
+            </button>
+          )
+        }
       </div>
     </div>
   );

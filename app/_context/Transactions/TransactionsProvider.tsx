@@ -28,18 +28,7 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
       setTransactions(transactionsData);
     }
 
-    try {
-      fetchData();
-    } catch (error) {
-      liff.sendMessages([{
-        type: 'text',
-        text: 'エラーが発生しました。時間をおいて再度お試しください。'
-      }]).then(() => {
-        liff.closeWindow();
-      }).catch((error) => {
-        console.log(error);
-      });
-    }
+    fetchData();
   }, [liff, getTransactions])
 
   return (

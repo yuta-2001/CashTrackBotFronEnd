@@ -75,9 +75,11 @@ export default function BillPage() {
 
     if (calculatedAmount === null) {
       alert('相手との取引がありません');
+      setPreviewImage(null);
       return;
     } else if (calculatedAmount.amount <= 0) {
       alert('精算額が0を下回っているため請求書を発行できません。');
+      setPreviewImage(null);
       return;
     }
 

@@ -28,18 +28,7 @@ export const OpponentsProvider: React.FC<OpponentsProviderProps> = ({ children }
       setOpponents(opponentsData);
     }
 
-    try {
-      fetchData();
-    } catch (error) {
-      liff.sendMessages([{
-        type: 'text',
-        text: 'エラーが発生しました。時間をおいて再度お試しください。'
-      }]).then(() => {
-        liff.closeWindow();
-      }).catch((error) => {
-        console.log(error);
-      });
-    }
+    fetchData();
   }, [liff, getOpponents])
 
   return (

@@ -13,6 +13,21 @@ let accessTokenCache: AccessTokenCache = {
   timestamp: null
 };
 
+// liffアプリを閉じ、LINEのトーク画面に遷移させる
+// また、トーク画面にエラーを通知する
+function errorHandler(liff: Liff) {
+  liff.sendMessages([{
+    type: 'text',
+    text: 'アプリケーションでエラーが発生しました。\n時間をおいて再度お試しください。'
+  }]).then(() => {
+    liff.closeWindow();
+    console.log("message sent");
+  })
+  .catch((err) => {
+    console.log("error", err);
+  });
+}
+
 async function getAccessToken(liff: Liff, cacheDuration = 300000) {
   const currentTime = new Date().getTime();
 
@@ -23,7 +38,8 @@ async function getAccessToken(liff: Liff, cacheDuration = 300000) {
   const accessToken = await liff.getAccessToken();
 
   if (!accessToken) {
-    throw new Error("Access token not found");
+    errorHandler(liff);
+    throw new Error("Access Token Error");
   }
 
   accessTokenCache = {
@@ -42,6 +58,7 @@ export async function getOpponents(liff: Liff) {
   const response = await fetch(`${API_DOMAIN}/api/liff/opponents?${query}`);
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -63,6 +80,7 @@ export async function storeOpponent(opponent: any, liff: Liff) {
   });
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -86,6 +104,7 @@ export async function updateOpponent(opponentId: number, opponent: any, liff: Li
   });
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -103,6 +122,7 @@ export async function deleteOpponent(opponent: any, liff: Liff) {
   });
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -118,6 +138,7 @@ export async function getTransactions(liff: Liff) {
   const response = await fetch(`${API_DOMAIN}/api/liff/transactions?${query}`);
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -139,6 +160,7 @@ export async function storeTransaction(transaction: any, liff: Liff) {
   });
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -162,6 +184,7 @@ export async function updateTransaction(transactionId: number, transaction: TTra
   });
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -185,6 +208,7 @@ export async function batchSettleTransaction(ids: Array<Number>, liff: Liff) {
   });
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -202,6 +226,7 @@ export async function deleteTransaction(transaction: TTransaction, liff: Liff) {
   });
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -224,6 +249,7 @@ export async function batchDeleteTransaction(ids: Array<Number>, liff: Liff) {
   });
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
@@ -246,6 +272,7 @@ export async function generateTransactionsBill(billInfo: TBillInfo, liff: Liff):
   });
 
   if (response.status !== 200) {
+    errorHandler(liff);
     throw new Error("API Error");
   }
 
